@@ -23,7 +23,7 @@
       background: #fee500;
       border-radius: 16px;
       padding: 32px 24px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
       text-align: center;
     }
     .login-box h1 {
@@ -63,6 +63,7 @@
       color: #b91c1c;
       min-height: 18px;
       font-weight: bold;
+      word-break: break-word;
     }
 
     /* 메인 메신저 앱 레이아웃 */
@@ -75,7 +76,7 @@
       background: #fff;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.45);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
     }
     .app-shell.active { display: flex; }
 
@@ -180,12 +181,12 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #b2c7d9; /* 카톡 기본 하늘색 배경 느낌 */
+      background: #b2c7d9;
     }
     .chat-header {
       padding: 14px 18px;
       background: #a3bacd;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -211,7 +212,7 @@
     }
     .empty-chat {
       margin: auto;
-      background: rgba(255,255,255,0.75);
+      background: rgba(255, 255, 255, 0.75);
       padding: 14px 20px;
       border-radius: 12px;
       font-size: 13px;
@@ -245,7 +246,7 @@
       font-size: 14px;
       line-height: 1.45;
       word-break: break-word;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
     .msg-row.mine .msg-bubble {
       background: #fee500;
@@ -296,17 +297,15 @@
 </head>
 <body>
 
-  <!-- 1. 로그인 화면 (회원가입 버튼 없음 -> 지정 계정만 접속 가능) -->
   <div class="login-box" id="loginBox">
     <h1>프라이빗 1:1 메신저</h1>
     <p>등록된 계정으로만 로그인할 수 있습니다.</p>
-    <input type="email" id="loginEmail" placeholder="아이디(이메일 형식)" autocomplete="username" />
+    <input type="email" id="loginEmail" placeholder="아이디(영문 이메일)" autocomplete="username" />
     <input type="password" id="loginPassword" placeholder="비밀번호" autocomplete="current-password" />
-    <button id="loginBtn">로그인</button>
+    <button id="loginBtn" type="button">로그인</button>
     <div class="error-msg" id="loginError"></div>
   </div>
 
-  <!-- 2. 메인 채팅 화면 -->
   <div class="app-shell" id="appShell">
     <aside class="sidebar">
       <div class="my-header">
@@ -314,13 +313,13 @@
           <div class="my-email" id="myEmailLabel">-</div>
           <div class="my-status" id="myStatusLabel">● 접속 중</div>
         </div>
-        <button class="logout-btn" id="logoutBtn">로그아웃</button>
+        <button class="logout-btn" id="logoutBtn" type="button">로그아웃</button>
       </div>
 
       <div class="add-friend-box">
         <input type="text" id="friendNameInput" placeholder="친구 이름 (예: 민수)" />
-        <input type="email" id="friendEmailInput" placeholder="친구 계정 이메일 (Firebase 등록 계정)" />
-        <button id="addFriendBtn">+ 친구 추가</button>
+        <input type="email" id="friendEmailInput" placeholder="친구 계정 이메일" />
+        <button id="addFriendBtn" type="button">+ 친구 추가</button>
       </div>
 
       <div class="friend-list-title">친구 목록</div>
@@ -365,7 +364,6 @@
       off
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-    // 입력하신 Firebase 설정 적용
     const firebaseConfig = {
       apiKey: "AIzaSyCFS4DUAlwNEE1XqcRpb-qbmaDxbbe6uwM",
       authDomain: "friend-chat-86116.firebaseapp.com",
@@ -403,9 +401,9 @@
     const sendBtn = document.getElementById("sendBtn");
 
     let currentUser = null;
-    let allUsersMap = {};     // email -> { uid, email, online, lastSeen }
-    let friendsMap = {};       // friendKey -> { name, email }
-    let selectedFriend = null; // { name, email, uid, online, lastSeen }
+    let allUsersMap = {};
+    let friendsMap = {};
+    let selectedFriend = null;
     let activeChatRef = null;
 
     function emailToKey(email) {
@@ -422,7 +420,6 @@
       return d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
     }
 
-    // 로그인 처리
     loginBtn.addEventListener("click", async () => {
       loginError.textContent = "";
       const email = loginEmail.value.trim();
@@ -434,7 +431,7 @@
       try {
         await signInWithEmailAndPassword(auth, email, pw);
       } catch (err) {
-        loginError.textContent = "로그인 실패: 등록된 계정인지 확인하세요.";
+        loginError.textContent = "로그인 실패: " + (err && err.code ? err.code : "계정 정보를 확인하세요.");
       }
     });
 
@@ -444,7 +441,7 @@
 
     logoutBtn.addEventListener("click", async () => {
       if (currentUser) {
-        const myPresenceRef = ref(db, `users/${currentUser.uid}`);
+        const myPresenceRef = ref(db, "users/" + currentUser.uid);
         await set(myPresenceRef, {
           uid: currentUser.uid,
           email: currentUser.email,
@@ -455,7 +452,6 @@
       await signOut(auth);
     });
 
-    // 인증 상태 감지 및 접속 상태(Presence) 설정
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
@@ -463,7 +459,7 @@
         appShell.classList.add("active");
         myEmailLabel.textContent = user.email;
 
-        const myUserRef = ref(db, `users/${user.uid}`);
+        const myUserRef = ref(db, "users/" + user.uid);
         const connectedRef = ref(db, ".info/connected");
 
         onValue(connectedRef, async (snap) => {
@@ -483,7 +479,6 @@
           }
         });
 
-        // 전체 사용자 접속 상태 구독
         onValue(ref(db, "users"), (snap) => {
           allUsersMap = {};
           const val = snap.val() || {};
@@ -496,8 +491,7 @@
           updateSelectedFriendHeader();
         });
 
-        // 내 친구 목록 구독
-        onValue(ref(db, `friends/${user.uid}`), (snap) => {
+        onValue(ref(db, "friends/" + user.uid), (snap) => {
           friendsMap = snap.val() || {};
           renderFriendList();
         });
@@ -515,7 +509,6 @@
       }
     });
 
-    // 친구 추가
     addFriendBtn.addEventListener("click", async () => {
       if (!currentUser) return;
       const name = friendNameInput.value.trim();
@@ -529,9 +522,9 @@
         return;
       }
       const fKey = emailToKey(email);
-      await set(ref(db, `friends/${currentUser.uid}/${fKey}`), {
+      await set(ref(db, "friends/" + currentUser.uid + "/" + fKey), {
         name: name || email,
-        email
+        email: email
       });
       friendNameInput.value = "";
       friendEmailInput.value = "";
@@ -541,7 +534,7 @@
       friendListEl.innerHTML = "";
       const entries = Object.values(friendsMap);
       if (entries.length === 0) {
-        friendListEl.innerHTML = `<div style="padding:16px;font-size:12px;color:#6b7280;text-align:center;">아직 추가된 친구가 없습니다.</div>`;
+        friendListEl.innerHTML = '<div style="padding:16px;font-size:12px;color:#6b7280;text-align:center;">아직 추가된 친구가 없습니다.</div>';
         return;
       }
 
@@ -551,15 +544,24 @@
         const item = document.createElement("div");
         item.className = "friend-item" + (selectedFriend && selectedFriend.email === f.email ? " selected" : "");
 
-        item.innerHTML = `
-          <div>
-            <div class="friend-name">${escapeHtml(f.name)}</div>
-            <div class="friend-sub">${escapeHtml(f.email)}</div>
-          </div>
-          <span class="presence-badge ${isOnline ? "online" : "offline"}">
-            ${isOnline ? "접속 중" : "오프라인"}
-          </span>
-        `;
+        const nameDiv = document.createElement("div");
+        const nameEl = document.createElement("div");
+        nameEl.className = "friend-name";
+        nameEl.textContent = f.name;
+
+        const subEl = document.createElement("div");
+        subEl.className = "friend-sub";
+        subEl.textContent = f.email;
+
+        nameDiv.appendChild(nameEl);
+        nameDiv.appendChild(subEl);
+
+        const badge = document.createElement("span");
+        badge.className = "presence-badge " + (isOnline ? "online" : "offline");
+        badge.textContent = isOnline ? "접속 중" : "오프라인";
+
+        item.appendChild(nameDiv);
+        item.appendChild(badge);
 
         item.addEventListener("click", () => {
           openChatWithFriend(f);
@@ -576,7 +578,7 @@
       chatTitle.textContent = selectedFriend.name;
       chatSubtitle.textContent = isOnline
         ? "● 현재 접속 중"
-        : (info && info.lastSeen ? `오프라인 · 최근 접속 ${formatTime(info.lastSeen)}` : "오프라인");
+        : (info && info.lastSeen ? "오프라인 · 최근 접속 " + formatTime(info.lastSeen) : "오프라인");
     }
 
     function openChatWithFriend(friend) {
@@ -597,7 +599,7 @@
       }
 
       if (!selectedFriend.uid) {
-        messagesBox.innerHTML = `<div class="empty-chat">친구가 아직 한 번도 로그인하지 않아 UID를 불러올 수 없습니다.<br/>친구가 먼저 로그인한 뒤 다시 클릭해 주세요.</div>`;
+        messagesBox.innerHTML = '<div class="empty-chat">친구가 아직 한 번도 로그인하지 않아 UID를 불러올 수 없습니다.<br/>친구가 먼저 로그인한 뒤 다시 클릭해 주세요.</div>';
         messageInput.disabled = true;
         sendBtn.disabled = true;
         return;
@@ -607,27 +609,42 @@
       sendBtn.disabled = false;
 
       const chatId = getPrivateChatId(currentUser.uid, selectedFriend.uid);
-      activeChatRef = ref(db, `chats/${chatId}/messages`);
+      activeChatRef = ref(db, "chats/" + chatId + "/messages");
 
       onValue(activeChatRef, (snap) => {
         messagesBox.innerHTML = "";
         const msgs = snap.val() || {};
         const list = Object.values(msgs);
         if (list.length === 0) {
-          messagesBox.innerHTML = `<div class="empty-chat">1:1 대화방이 열렸습니다. 첫 메시지를 보내보세요!</div>`;
+          messagesBox.innerHTML = '<div class="empty-chat">1:1 대화방이 열렸습니다. 첫 메시지를 보내보세요!</div>';
           return;
         }
         list.forEach((m) => {
           const isMine = m.senderUid === currentUser.uid;
           const row = document.createElement("div");
-          row.className = `msg-row ${isMine ? "mine" : "theirs"}`;
-          row.innerHTML = `
-            ${!isMine ? `<div class="msg-sender">${escapeHtml(selectedFriend.name)}</div>` : ""}
-            <div class="msg-bubble-wrap">
-              <div class="msg-bubble">${escapeHtml(m.text)}</div>
-              <div class="msg-time">${formatTime(m.createdAt)}</div>
-            </div>
-          `;
+          row.className = "msg-row " + (isMine ? "mine" : "theirs");
+
+          if (!isMine) {
+            const senderEl = document.createElement("div");
+            senderEl.className = "msg-sender";
+            senderEl.textContent = selectedFriend.name;
+            row.appendChild(senderEl);
+          }
+
+          const wrap = document.createElement("div");
+          wrap.className = "msg-bubble-wrap";
+
+          const bubble = document.createElement("div");
+          bubble.className = "msg-bubble";
+          bubble.textContent = m.text;
+
+          const timeEl = document.createElement("div");
+          timeEl.className = "msg-time";
+          timeEl.textContent = formatTime(m.createdAt);
+
+          wrap.appendChild(bubble);
+          wrap.appendChild(timeEl);
+          row.appendChild(wrap);
           messagesBox.appendChild(row);
         });
         messagesBox.scrollTop = messagesBox.scrollHeight;
@@ -641,23 +658,15 @@
       if (!text) return;
 
       const chatId = getPrivateChatId(currentUser.uid, selectedFriend.uid);
-      await push(ref(db, `chats/${chatId}/messages`), {
+      await push(ref(db, "chats/" + chatId + "/messages"), {
         senderUid: currentUser.uid,
         senderEmail: currentUser.email,
-        text,
+        text: text,
         createdAt: Date.now()
       });
       messageInput.value = "";
       messageInput.focus();
     });
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, """);
-    }
   </script>
 </body>
 </html>
