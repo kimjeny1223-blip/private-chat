@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FEE500" />
+  <title>1:1 프라이빗 메신저</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #1e1f22;
+      color: #222;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 로그인 화면 */
+    .login-box {
+      width: 360px;
+      background: #fee500;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+    .login-box h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #191919;
+    }
+    .login-box p {
+      font-size: 13px;
+      color: #4a4000;
+      margin-bottom: 20px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e0c800;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #3c1e1e;
+      color: #fff;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: #261212; }
+    .error-msg {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b91c1c;
+      min-height: 18px;
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    /* 메인 메신저 앱 레이아웃 */
+    .app-shell {
+      display: none;
+      width: 100%;
+      max-width: 920px;
+      height: 92vh;
+      max-height: 760px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+    .app-shell.active { display: flex; }
+
+    /* 좌측 친구 목록 패널 */
+    .sidebar {
+      width: 310px;
+      background: #f7f7f8;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+    }
+    .my-header {
+      padding: 16px;
+      background: #fff;
+      border-bottom: 1px solid #eceef2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .my-info .my-email {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+    }
+    .my-info .my-status {
+      font-size: 12px;
+      color: #16a34a;
+      margin-top: 2px;
+    }
+    .logout-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .logout-btn:hover { background: #f3f4f6; }
+
+    /* 친구 추가 폼 */
+    .add-friend-box {
+      padding: 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .add-friend-box input {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .add-friend-box button {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #fee500;
+      color: #191919;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .add-friend-box button:hover { background: #f5dc00; }
+
+    .friend-list-title {
+      padding: 10px 16px 6px;
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: bold;
+    }
+    .friend-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 8px;
+    }
+    .friend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 4px;
+    }
+    .friend-item:hover { background: #eceff3; }
+    .friend-item.selected { background: #fff3a1; }
+    .friend-name { font-size: 14px; font-weight: bold; color: #111; }
+    .friend-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    .presence-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+    .online { background: #dcfce7; color: #15803d; }
+    .offline { background: #e5e7eb; color: #4b5563; }
+
+    /* 우측 채팅방 패널 */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #b2c7d9;
+    }
+    .chat-header {
+      padding: 14px 18px;
+      background: #a3bacd;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-header-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #111827;
+    }
+    .chat-header-sub {
+      font-size: 12px;
+      color: #1f2937;
+      margin-top: 2px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .empty-chat {
+      margin: auto;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #374151;
+      text-align: center;
+    }
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+    }
+    .msg-row.mine { align-self: flex-end; align-items: flex-end; }
+    .msg-row.theirs { align-self: flex-start; align-items: flex-start; }
+
+    .msg-sender {
+      font-size: 11px;
+      color: #1f2937;
+      margin-bottom: 3px;
+      padding: 0 4px;
+    }
+    .msg-bubble-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .msg-row.mine .msg-bubble-wrap { flex-direction: row-reverse; }
+
+    .msg-bubble {
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .msg-row.mine .msg-bubble {
+      background: #fee500;
+      color: #191919;
+      border-top-right-radius: 4px;
+    }
+    .msg-row.theirs .msg-bubble {
+      background: #ffffff;
+      color: #111827;
+      border-top-left-radius: 4px;
+    }
+    .msg-time {
+      font-size: 10px;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .chat-input-area {
+      background: #ffffff;
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #d1d5db;
+    }
+    .chat-input-area input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .chat-input-area button {
+      padding: 0 18px;
+      border: none;
+      border-radius: 8px;
+      background: #fee500;
+      color: #191919;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .chat-input-area button:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box" id="loginBox">
+    <h1>프라이빗 1:1 메신저</h1>
+    <p>등록된 계정으로만 로그인할 수 있습니다.</p>
+    <input type="email" id="loginEmail" placeholder="아이디(영문 이메일)" autocomplete="username" />
+    <input type="password" id="loginPassword" placeholder="비밀번호" autocomplete="current-password" />
+    <button id="loginBtn" type="button">로그인</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar">
+      <div class="my-header">
+        <div class="my-info">
+          <div class="my-email" id="myEmailLabel">-</div>
+          <div class="my-status" id="myStatusLabel">● 접속 중</div>
+        </div>
+        <button class="logout-btn" id="logoutBtn" type="button">로그아웃</button>
+      </div>
+
+      <div class="add-friend-box">
+        <input type="text" id="friendNameInput" placeholder="친구 이름 (예: 민수)" />
+        <input type="email" id="friendEmailInput" placeholder="친구 계정 이메일" />
+        <button id="addFriendBtn" type="button">+ 친구 추가</button>
+      </div>
+
+      <div class="friend-list-title">친구 목록</div>
+      <div class="friend-list" id="friendList"></div>
+    </aside>
+
+    <section class="chat-panel">
+      <div class="chat-header">
+        <div>
+          <div class="chat-header-title" id="chatTitle">대화를 시작할 친구를 선택하세요</div>
+          <div class="chat-header-sub" id="chatSubtitle">좌측 목록에서 친구를 클릭하면 1:1 채팅방이 열립니다.</div>
+        </div>
+      </div>
+
+      <div class="messages" id="messagesBox">
+        <div class="empty-chat">친구를 추가하고 선택하면 1:1 대화가 시작됩니다.</div>
+      </div>
+
+      <form class="chat-input-area" id="chatForm">
+        <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." disabled />
+        <button type="submit" id="sendBtn" disabled>전송</button>
+      </form>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      push,
+      onValue,
+      onDisconnect,
+      serverTimestamp,
+      off
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFS4DUAlwNEE1XqcRpb-qbmaDxbbe6uwM",
+      authDomain: "friend-chat-86116.firebaseapp.com",
+      databaseURL: "https://friend-chat-86116-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "friend-chat-86116",
+      storageBucket: "friend-chat-86116.firebasestorage.app",
+      messagingSenderId: "405206237942",
+      appId: "1:405206237942:web:df497ac5990e5d5b2ba2d7",
+      measurementId: "G-M3Q0KXDS91"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const loginBox = document.getElementById("loginBox");
+    const appShell = document.getElementById("appShell");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginError = document.getElementById("loginError");
+
+    const myEmailLabel = document.getElementById("myEmailLabel");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const friendNameInput = document.getElementById("friendNameInput");
+    const friendEmailInput = document.getElementById("friendEmailInput");
+    const addFriendBtn = document.getElementById("addFriendBtn");
+    const friendListEl = document.getElementById("friendList");
+
+    const chatTitle = document.getElementById("chatTitle");
+    const chatSubtitle = document.getElementById("chatSubtitle");
+    const messagesBox = document.getElementById("messagesBox");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    let currentUser = null;
+    let allUsersMap = {};
+    let friendsMap = {};
+    let selectedFriend = null;
+    let activeChatRef = null;
+
+    function emailToKey(email) {
+      return email.trim().toLowerCase().replace(/[.#$[\]]/g, "_");
+    }
+
+    function getPrivateChatId(uidA, uidB) {
+      return [uidA, uidB].sort().join("_");
+    }
+
+    function formatTime(ts) {
+      if (!ts) return "";
+      const d = new Date(ts);
+      return d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    loginBtn.addEventListener("click", async () => {
+      loginError.textContent = "";
+      const email = loginEmail.value.trim();
+      const pw = loginPassword.value;
+      if (!email || !pw) {
+        loginError.textContent = "이메일과 비밀번호를 모두 입력하세요.";
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+      } catch (err) {
+        loginError.textContent = "로그인 실패: " + (err && err.code ? err.code : "계정 정보를 확인하세요.");
+      }
+    });
+
+    loginPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loginBtn.click();
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      if (currentUser) {
+        const myPresenceRef = ref(db, "users/" + currentUser.uid);
+        await set(myPresenceRef, {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          online: false,
+          lastSeen: Date.now()
+        });
+      }
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        loginBox.style.display = "none";
+        appShell.classList.add("active");
+        myEmailLabel.textContent = user.email;
+
+        const myUserRef = ref(db, "users/" + user.uid);
+        const connectedRef = ref(db, ".info/connected");
+
+        onValue(connectedRef, async (snap) => {
+          if (snap.val() === true) {
+            await onDisconnect(myUserRef).set({
+              uid: user.uid,
+              email: user.email,
+              online: false,
+              lastSeen: serverTimestamp()
+            });
+            await set(myUserRef, {
+              uid: user.uid,
+              email: user.email,
+              online: true,
+              lastSeen: Date.now()
+            });
+          }
+        });
+
+        onValue(ref(db, "users"), (snap) => {
+          allUsersMap = {};
+          const val = snap.val() || {};
+          Object.values(val).forEach((u) => {
+            if (u && u.email) {
+              allUsersMap[u.email.toLowerCase()] = u;
+            }
+          });
+          renderFriendList();
+          updateSelectedFriendHeader();
+        });
+
+        onValue(ref(db, "friends/" + user.uid), (snap) => {
+          friendsMap = snap.val() || {};
+          renderFriendList();
+        });
+      } else {
+        currentUser = null;
+        selectedFriend = null;
+        if (activeChatRef) {
+          off(activeChatRef);
+          activeChatRef = null;
+        }
+        appShell.classList.remove("active");
+        loginBox.style.display = "block";
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+      }
+    });
+
+    addFriendBtn.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const name = friendNameInput.value.trim();
+      const email = friendEmailInput.value.trim().toLowerCase();
+      if (!email) {
+        alert("친구 계정의 이메일을 입력하세요.");
+        return;
+      }
+      if (email === currentUser.email.toLowerCase()) {
+        alert("본인 계정은 친구로 추가할 수 없습니다.");
+        return;
+      }
+      const fKey = emailToKey(email);
+      await set(ref(db, "friends/" + currentUser.uid + "/" + fKey), {
+        name: name || email,
+        email: email
+      });
+      friendNameInput.value = "";
+      friendEmailInput.value = "";
+    });
+
+    function renderFriendList() {
+      friendListEl.innerHTML = "";
+      const entries = Object.values(friendsMap);
+      if (entries.length === 0) {
+        friendListEl.innerHTML = '<div style="padding:16px;font-size:12px;color:#6b7280;text-align:center;">아직 추가된 친구가 없습니다.</div>';
+        return;
+      }
+
+      entries.forEach((f) => {
+        const userInfo = allUsersMap[f.email.toLowerCase()];
+        const isOnline = Boolean(userInfo && userInfo.online);
+        const item = document.createElement("div");
+        item.className = "friend-item" + (selectedFriend && selectedFriend.email === f.email ? " selected" : "");
+
+        const nameDiv = document.createElement("div");
+        const nameEl = document.createElement("div");
+        nameEl.className = "friend-name";
+        nameEl.textContent = f.name;
+
+        const subEl = document.createElement("div");
+        subEl.className = "friend-sub";
+        subEl.textContent = f.email;
+
+        nameDiv.appendChild(nameEl);
+        nameDiv.appendChild(subEl);
+
+        const badge = document.createElement("span");
+        badge.className = "presence-badge " + (isOnline ? "online" : "offline");
+        badge.textContent = isOnline ? "접속 중" : "오프라인";
+
+        item.appendChild(nameDiv);
+        item.appendChild(badge);
+
+        item.addEventListener("click", () => {
+          openChatWithFriend(f);
+        });
+
+        friendListEl.appendChild(item);
+      });
+    }
+
+    function updateSelectedFriendHeader() {
+      if (!selectedFriend) return;
+      const info = allUsersMap[selectedFriend.email.toLowerCase()];
+      const isOnline = Boolean(info && info.online);
+      chatTitle.textContent = selectedFriend.name;
+      chatSubtitle.textContent = isOnline
+        ? "● 현재 접속 중"
+        : (info && info.lastSeen ? "오프라인 · 최근 접속 " + formatTime(info.lastSeen) : "오프라인");
+    }
+
+    function openChatWithFriend(friend) {
+      if (!currentUser) return;
+      const info = allUsersMap[friend.email.toLowerCase()];
+      selectedFriend = {
+        name: friend.name,
+        email: friend.email,
+        uid: info ? info.uid : null
+      };
+
+      renderFriendList();
+      updateSelectedFriendHeader();
+
+      if (activeChatRef) {
+        off(activeChatRef);
+        activeChatRef = null;
+      }
+
+      if (!selectedFriend.uid) {
+        messagesBox.innerHTML = '<div class="empty-chat">친구가 아직 한 번도 로그인하지 않아 UID를 불러올 수 없습니다.<br/>친구가 먼저 로그인한 뒤 다시 클릭해 주세요.</div>';
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        return;
+      }
+
+      messageInput.disabled = false;
+      sendBtn.disabled = false;
+
+      const chatId = getPrivateChatId(currentUser.uid, selectedFriend.uid);
+      activeChatRef = ref(db, "chats/" + chatId + "/messages");
+
+      onValue(activeChatRef, (snap) => {
+        messagesBox.innerHTML = "";
+        const msgs = snap.val() || {};
+        const list = Object.values(msgs);
+        if (list.length === 0) {
+          messagesBox.innerHTML = '<div class="empty-chat">1:1 대화방이 열렸습니다. 첫 메시지를 보내보세요!</div>';
+          return;
+        }
+        list.forEach((m) => {
+          const isMine = m.senderUid === currentUser.uid;
+          const row = document.createElement("div");
+          row.className = "msg-row " + (isMine ? "mine" : "theirs");
+
+          if (!isMine) {
+            const senderEl = document.createElement("div");
+            senderEl.className = "msg-sender";
+            senderEl.textContent = selectedFriend.name;
+            row.appendChild(senderEl);
+          }
+
+          const wrap = document.createElement("div");
+          wrap.className = "msg-bubble-wrap";
+
+          const bubble = document.createElement("div");
+          bubble.className = "msg-bubble";
+          bubble.textContent = m.text;
+
+          const timeEl = document.createElement("div");
+          timeEl.className = "msg-time";
+          timeEl.textContent = formatTime(m.createdAt);
+
+          wrap.appendChild(bubble);
+          wrap.appendChild(timeEl);
+          row.appendChild(wrap);
+          messagesBox.appendChild(row);
+        });
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      });
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser || !selectedFriend || !selectedFriend.uid) return;
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      const chatId = getPrivateChatId(currentUser.uid, selectedFriend.uid);
+      await push(ref(db, "chats/" + chatId + "/messages"), {
+        senderUid: currentUser.uid,
+        senderEmail: currentUser.email,
+        text: text,
+        createdAt: Date.now()
+      });
+      messageInput.value = "";
+      messageInput.focus();
+    });
+  </script>
+</body>
+</html>
