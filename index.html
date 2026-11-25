@@ -1,0 +1,3028 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FEE500" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="하하하톡" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>하하하톡</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #1e1f22;
+      color: #222;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    body {
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-box {
+      width: min(360px, 92vw);
+      background: #fee500;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+    .login-box h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #191919;
+    }
+    .login-box p {
+      font-size: 13px;
+      color: #4a4000;
+      margin-bottom: 20px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e0c800;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fff;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #3c1e1e;
+      color: #fff;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: #261212; }
+    .error-msg {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b91c1c;
+      min-height: 18px;
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    .app-shell {
+      display: none;
+      width: 100%;
+      max-width: 980px;
+      height: 92dvh;
+      max-height: 780px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+    .app-shell.active { display: flex; }
+
+    .sidebar {
+      width: 335px;
+      background: #f7f7f8;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .my-header {
+      padding: 12px 14px;
+      background: #fff;
+      border-bottom: 1px solid #eceef2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .my-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .my-info {
+      min-width: 0;
+      flex: 1;
+    }
+    .my-info .my-email {
+      font-size: 13px;
+      font-weight: bold;
+      color: #111;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .my-info .my-status {
+      font-size: 11px;
+      color: #16a34a;
+      margin-top: 2px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .util-btn {
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #1f2937;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .util-btn:hover { background: #f3f4f6; }
+    .install-btn {
+      display: none;
+      background: #fee500;
+      border-color: #e5cc00;
+      color: #191919;
+    }
+    .install-btn.visible { display: inline-flex; align-items: center; }
+    .push-btn {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+    .push-btn.enabled {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #15803d;
+    }
+
+    .action-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #efefef;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .action-tab-btn {
+      padding: 9px 8px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: bold;
+      color: #4b5563;
+      cursor: pointer;
+    }
+    .action-tab-btn.active {
+      background: #fafafa;
+      color: #111;
+      border-bottom: 2px solid #fee500;
+    }
+
+    .add-friend-box, .create-group-box {
+      padding: 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .create-group-box { display: none; }
+    .create-group-box.active { display: block; }
+    .add-friend-box.hidden { display: none; }
+
+    .add-friend-box input, .create-group-box input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+    }
+    .group-member-picker {
+      max-height: 110px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-bottom: 8px;
+    }
+    .group-member-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 3px 0;
+      cursor: pointer;
+    }
+    .add-friend-box button, .create-group-box button {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: #fee500;
+      color: #191919;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .add-friend-box button:hover, .create-group-box button:hover { background: #f5dc00; }
+    .add-friend-box button:disabled, .create-group-box button:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .list-scroll-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 10px;
+    }
+    .friend-list-title {
+      padding: 10px 16px 6px;
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: bold;
+    }
+    .friend-list {
+      padding: 2px 8px;
+    }
+    .friend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+    .friend-item:hover { background: #eceff3; }
+    .friend-item.selected { background: #fff3a1; }
+    .friend-name { font-size: 14px; font-weight: bold; color: #111; }
+    .friend-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+    .friend-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .unread-badge {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .presence-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+    .online { background: #dcfce7; color: #15803d; }
+    .offline { background: #e5e7eb; color: #4b5563; }
+    .group-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .chat-panel {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #b2c7d9;
+      position: relative;
+    }
+    .chat-header {
+      padding: 12px 16px;
+      background: #a3bacd;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .mobile-back-btn {
+      display: none;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.45);
+      color: #111827;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .chat-header-text {
+      min-width: 0;
+      flex: 1;
+    }
+    .chat-header-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #111827;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-header-sub {
+      font-size: 12px;
+      color: #1f2937;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-header-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .chat-refresh-btn {
+      padding: 7px 10px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #111827;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chat-refresh-btn:hover { background: #ffffff; }
+    .voice-call-btn {
+      padding: 7px 12px;
+      border: none;
+      border-radius: 8px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .voice-call-btn:hover:not(:disabled) {
+      background: #15803d;
+    }
+    .voice-call-btn:disabled {
+      background: rgba(255, 255, 255, 0.45);
+      color: #4b5563;
+      cursor: not-allowed;
+    }
+
+    .call-banner {
+      display: none;
+      padding: 10px 16px;
+      background: #1f2937;
+      color: #fff;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .call-banner.active {
+      display: flex;
+    }
+    .call-banner.connected {
+      background: #14532d;
+    }
+    .call-controls {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .call-btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .call-btn.accept { background: #22c55e; color: #111; }
+    .call-btn.mute { background: #374151; color: #fff; border: 1px solid #6b7280; }
+    .call-btn.mute.muted { background: #f59e0b; color: #111; border-color: #f59e0b; }
+    .call-btn.hangup { background: #ef4444; color: #fff; }
+
+    .incoming-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .incoming-modal-backdrop.open {
+      display: flex;
+    }
+    .incoming-modal-card {
+      width: min(330px, 100%);
+      background: #1f2937;
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 28px 22px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .ring-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      animation: ringShake 0.8s infinite ease-in-out;
+    }
+    @keyframes ringShake {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-14deg); }
+      40% { transform: rotate(14deg); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+    }
+    .incoming-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .incoming-sub {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-bottom: 22px;
+    }
+    .incoming-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .modal-call-btn {
+      padding: 12px 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal-call-btn.accept {
+      background: #22c55e;
+      color: #111827;
+    }
+    .modal-call-btn.accept:hover { background: #16a34a; color: #fff; }
+    .modal-call-btn.reject {
+      background: #ef4444;
+      color: #ffffff;
+    }
+    .modal-call-btn.reject:hover { background: #dc2626; }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .empty-chat {
+      margin: auto;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #374151;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .system-msg-row {
+      align-self: center;
+      background: rgba(17, 24, 39, 0.45);
+      color: #f9fafb;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 90%;
+    }
+    .system-msg-time {
+      font-size: 10px;
+      color: #e5e7eb;
+      opacity: 0.85;
+    }
+
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 78%;
+    }
+    .msg-row.mine { align-self: flex-end; align-items: flex-end; }
+    .msg-row.theirs { align-self: flex-start; align-items: flex-start; }
+
+    .msg-sender {
+      font-size: 11px;
+      color: #1f2937;
+      margin-bottom: 3px;
+      padding: 0 4px;
+      font-weight: bold;
+    }
+    .msg-bubble-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .msg-row.mine .msg-bubble-wrap { flex-direction: row-reverse; }
+
+    .msg-bubble {
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .msg-row.mine .msg-bubble {
+      background: #fee500;
+      color: #191919;
+      border-top-right-radius: 4px;
+    }
+    .msg-row.theirs .msg-bubble {
+      background: #ffffff;
+      color: #111827;
+      border-top-left-radius: 4px;
+    }
+    .msg-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .msg-row.theirs .msg-meta {
+      align-items: flex-start;
+    }
+    .msg-time {
+      font-size: 10px;
+      color: #374151;
+      white-space: nowrap;
+    }
+    .msg-delete-btn {
+      border: none;
+      background: rgba(0, 0, 0, 0.14);
+      color: #1f2937;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .msg-delete-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .emoji-picker-panel {
+      display: none;
+      position: absolute;
+      left: 12px;
+      bottom: 64px;
+      width: 390px;
+      max-width: calc(100% - 24px);
+      height: 310px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+      z-index: 25;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .emoji-picker-panel.open {
+      display: flex;
+    }
+    .emoji-cat-bar {
+      display: flex;
+      gap: 4px;
+      padding: 8px;
+      background: #f3f4f6;
+      border-bottom: 1px solid #e5e7eb;
+      overflow-x: auto;
+    }
+    .emoji-cat-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #4b5563;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .emoji-cat-btn.active {
+      background: #fee500;
+      color: #111;
+    }
+    .emoji-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      align-content: start;
+    }
+    .emoji-cell-btn {
+      height: 34px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .emoji-cell-btn:hover {
+      background: #f3f4f6;
+    }
+    .emoji-footer-note {
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #6b7280;
+      background: #fafafa;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .chat-input-area {
+      background: #ffffff;
+      padding: 10px 12px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #d1d5db;
+      align-items: center;
+    }
+    .emoji-toggle-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f9fafb;
+      font-size: 19px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .emoji-toggle-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+    .emoji-toggle-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .chat-input-area input {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .chat-input-area button[type="submit"] {
+      height: 38px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 8px;
+      background: #fee500;
+      color: #191919;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chat-input-area button[type="submit"]:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    /* Mobile KakaoTalk-style Responsive Layout */
+    @media (max-width: 768px) {
+      body {
+        background: #ffffff;
+        align-items: stretch;
+      }
+      .login-box {
+        margin: auto;
+      }
+      .app-shell {
+        max-width: none;
+        width: 100vw;
+        height: 100dvh;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        padding-top: env(safe-area-inset-top);
+      }
+      .chat-panel {
+        display: none;
+        width: 100%;
+        padding-top: env(safe-area-inset-top);
+      }
+      .app-shell.mobile-chat-open .sidebar {
+        display: none;
+      }
+      .app-shell.mobile-chat-open .chat-panel {
+        display: flex;
+      }
+      .mobile-back-btn {
+        display: inline-flex;
+      }
+      .chat-input-area input,
+      .add-friend-box input,
+      .create-group-box input[type="text"],
+      .login-box input {
+        font-size: 16px;
+      }
+      .emoji-picker-panel {
+        left: 8px;
+        width: calc(100% - 16px);
+        max-width: none;
+        height: 280px;
+      }
+      .emoji-grid {
+        grid-template-columns: repeat(7, 1fr);
+      }
+      .chat-refresh-btn {
+        padding: 7px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box" id="loginBox">
+    <h1>하하하 메신저</h1>
+    <p>1:1 채팅 · 단체톡 · 보이스톡</p>
+    <input type="email" id="loginEmail" placeholder="아이디(영문 이메일)" autocomplete="username" />
+    <input type="password" id="loginPassword" placeholder="비밀번호" autocomplete="current-password" />
+    <button id="loginBtn" type="button">로그인</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar">
+      <div class="my-header">
+        <div class="my-header-top">
+          <div class="my-info">
+            <div class="my-email" id="myEmailLabel">-</div>
+            <div class="my-status" id="myStatusLabel">● 접속 중</div>
+          </div>
+          <button class="util-btn" id="logoutBtn" type="button">로그아웃</button>
+        </div>
+        <div class="header-actions">
+          <button class="util-btn install-btn" id="installAppBtn" type="button" title="홈 화면 / PC 앱으로 설치">📲 앱 설치</button>
+          <button class="util-btn push-btn" id="enablePushBtn" type="button" title="잠금화면 및 PC 우측 하단 알림 설정">🔔 알림 켜기</button>
+          <button class="util-btn" id="sidebarRefreshBtn" type="button" title="창 새로고침">🔄 새로고침</button>
+        </div>
+      </div>
+
+      <div class="action-tabs">
+        <button type="button" class="action-tab-btn active" id="tabFriendBtn">+ 친구 추가</button>
+        <button type="button" class="action-tab-btn" id="tabGroupBtn">+ 단체톡 만들기</button>
+      </div>
+
+      <div class="add-friend-box" id="addFriendBox">
+        <input type="text" id="friendNameInput" placeholder="친구 이름 (예: 민수)" />
+        <input type="email" id="friendEmailInput" placeholder="친구 계정 이메일" />
+        <button id="addFriendBtn" type="button">+ 친구 추가</button>
+      </div>
+
+      <div class="create-group-box" id="createGroupBox">
+        <input type="text" id="groupTitleInput" placeholder="단체톡 방 이름 (예: 프로젝트 팀방)" />
+        <div class="group-member-picker" id="groupMemberPicker">
+          <div style="font-size:11px;color:#6b7280;">초대할 친구가 없습니다. 먼저 친구를 추가하세요.</div>
+        </div>
+        <button id="createGroupBtn" type="button">단체톡 방 생성</button>
+      </div>
+
+      <div class="list-scroll-wrap">
+        <div class="friend-list-title">단체톡 목록</div>
+        <div class="friend-list" id="groupList"></div>
+
+        <div class="friend-list-title">친구 목록 (1:1)</div>
+        <div class="friend-list" id="friendList"></div>
+      </div>
+    </aside>
+
+    <section class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <button type="button" class="mobile-back-btn" id="mobileBackBtn" title="목록으로 돌아가기">←</button>
+          <div class="chat-header-text">
+            <div class="chat-header-title" id="chatTitle">대화방을 선택하세요</div>
+            <div class="chat-header-sub" id="chatSubtitle">좌측 목록에서 친구 또는 단체톡을 클릭하면 대화가 열립니다.</div>
+          </div>
+        </div>
+        <div class="chat-header-btns">
+          <button type="button" class="chat-refresh-btn" id="chatRefreshBtn" title="창 새로고침">🔄 새로고침</button>
+          <button type="button" class="voice-call-btn" id="voiceCallBtn" disabled>📞 보이스톡</button>
+        </div>
+      </div>
+
+      <div class="call-banner" id="callBanner">
+        <span id="callStatusText">보이스톡 연결 중...</span>
+        <div class="call-controls" id="callControls"></div>
+      </div>
+
+      <audio id="remoteAudio" autoplay playsinline style="display:none;"></audio>
+
+      <div class="messages" id="messagesBox">
+        <div class="empty-chat">친구를 선택해 1:1 대화·보이스톡을 하거나,<br/>단체톡을 만들어 여럿이 함께 대화해 보세요!</div>
+      </div>
+
+      <div class="emoji-picker-panel" id="emojiPickerPanel" aria-label="전체 이모지 선택창">
+        <div class="emoji-cat-bar" id="emojiCatBar"></div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+        <div class="emoji-footer-note">유니코드 이모지 전체 모음 · Windows 기본창은 Win + .</div>
+      </div>
+
+      <form class="chat-input-area" id="chatForm">
+        <button type="button" class="emoji-toggle-btn" id="emojiToggleBtn" title="이모지 선택창 열기" disabled>😀</button>
+        <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." disabled />
+        <button type="submit" id="sendBtn" disabled>전송</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Incoming Voice Call Modal -->
+  <div class="incoming-modal-backdrop" id="incomingCallModal" role="dialog" aria-modal="true" aria-labelledby="incomingCallerTitle">
+    <div class="incoming-modal-card">
+      <div class="ring-icon">📞</div>
+      <div class="incoming-title" id="incomingCallerTitle">보이스톡 수신 중</div>
+      <div class="incoming-sub" id="incomingCallerSub">음성 통화 요청이 왔습니다.</div>
+      <div class="incoming-actions">
+        <button type="button" class="modal-call-btn accept" id="modalAcceptCallBtn">통화</button>
+        <button type="button" class="modal-call-btn reject" id="modalRejectCallBtn">거절</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      query,
+      limitToLast,
+      set,
+      push,
+      get,
+      update,
+      remove,
+      onValue,
+      onChildAdded,
+      onDisconnect,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import {
+      getMessaging,
+      getToken,
+      isSupported
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
+
+    // =========================================================================
+    // [필수 설정] 아래 2개 값만 입력하면 핸드폰 잠금화면·백그라운드 푸시가 작동합니다.
+    // =========================================================================
+    const FCM_VAPID_KEY = "BMmUMjbrjViLbJS5OVQIqtRhUGC6sIAwZwMk4Ca3ekPBsD5zCLO5WXXEXwCVYinBiMNwSYjdUxY0KCxyWrYdKuo";
+    const PUSH_WORKER_URL = "https://private-chat-push.kimjeny1223.workers.dev";
+    // true로 바꾸면 Cloudflare 서버에 실제 대화 내용을 보내지 않고 "새 메시지가 도착했습니다."만 전송합니다.
+    const HIDE_PUSH_MESSAGE_PREVIEW = false;
+    // =========================================================================
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFS4DUAlwNEE1XqcRpb-qbmaDxbbe6uwM",
+      authDomain: "friend-chat-86116.firebaseapp.com",
+      databaseURL: "https://friend-chat-86116-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "friend-chat-86116",
+      storageBucket: "friend-chat-86116.firebasestorage.app",
+      messagingSenderId: "405206237942",
+      appId: "1:405206237942:web:df497ac5990e5d5b2ba2d7",
+      measurementId: "G-M3Q0KXDS91"
+    };
+
+    const RTC_CONFIG = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun.cloudflare.com:3478" },
+        {
+          urls: [
+            "turn:openrelay.metered.ca:80",
+            "turn:openrelay.metered.ca:443",
+            "turn:openrelay.metered.ca:443?transport=tcp"
+          ],
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ],
+      iceCandidatePoolSize: 4
+    };
+
+    // 트래픽 절약: 열린 대화방은 최근 150개, 백그라운드 미읽음 감시는 최근 30개만 구독
+    const ACTIVE_CHAT_LIMIT = 150;
+    const WATCHER_CHAT_LIMIT = 30;
+    const RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
+    const RING_TIMEOUT_MS = 45 * 1000;
+    const LAST_ROOM_STORAGE_KEY = "pm_last_room_v1";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // PWA & Push Service Worker registration
+    let swRegPromise = null;
+    if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+      swRegPromise = navigator.serviceWorker.register("./sw.js").catch(() => null);
+    }
+
+    const loginBox = document.getElementById("loginBox");
+    const appShell = document.getElementById("appShell");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginError = document.getElementById("loginError");
+
+    const myEmailLabel = document.getElementById("myEmailLabel");
+    const installAppBtn = document.getElementById("installAppBtn");
+    const enablePushBtn = document.getElementById("enablePushBtn");
+    const sidebarRefreshBtn = document.getElementById("sidebarRefreshBtn");
+    const chatRefreshBtn = document.getElementById("chatRefreshBtn");
+    const mobileBackBtn = document.getElementById("mobileBackBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const tabFriendBtn = document.getElementById("tabFriendBtn");
+    const tabGroupBtn = document.getElementById("tabGroupBtn");
+    const addFriendBox = document.getElementById("addFriendBox");
+    const createGroupBox = document.getElementById("createGroupBox");
+
+    const friendNameInput = document.getElementById("friendNameInput");
+    const friendEmailInput = document.getElementById("friendEmailInput");
+    const addFriendBtn = document.getElementById("addFriendBtn");
+
+    const groupTitleInput = document.getElementById("groupTitleInput");
+    const groupMemberPicker = document.getElementById("groupMemberPicker");
+    const createGroupBtn = document.getElementById("createGroupBtn");
+
+    const groupListEl = document.getElementById("groupList");
+    const friendListEl = document.getElementById("friendList");
+
+    const chatTitle = document.getElementById("chatTitle");
+    const chatSubtitle = document.getElementById("chatSubtitle");
+    const voiceCallBtn = document.getElementById("voiceCallBtn");
+    const callBanner = document.getElementById("callBanner");
+    const callStatusText = document.getElementById("callStatusText");
+    const callControls = document.getElementById("callControls");
+    const remoteAudio = document.getElementById("remoteAudio");
+
+    const incomingCallModal = document.getElementById("incomingCallModal");
+    const incomingCallerTitle = document.getElementById("incomingCallerTitle");
+    const incomingCallerSub = document.getElementById("incomingCallerSub");
+    const modalAcceptCallBtn = document.getElementById("modalAcceptCallBtn");
+    const modalRejectCallBtn = document.getElementById("modalRejectCallBtn");
+
+    const messagesBox = document.getElementById("messagesBox");
+    const emojiPickerPanel = document.getElementById("emojiPickerPanel");
+    const emojiCatBar = document.getElementById("emojiCatBar");
+    const emojiGrid = document.getElementById("emojiGrid");
+    const emojiToggleBtn = document.getElementById("emojiToggleBtn");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    let deferredInstallPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      installAppBtn.classList.add("visible");
+    });
+
+    installAppBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      try {
+        await deferredInstallPrompt.userChoice;
+      } catch (_) {}
+      deferredInstallPrompt = null;
+      installAppBtn.classList.remove("visible");
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      installAppBtn.classList.remove("visible");
+    });
+
+    function saveLastRoomToSession(roomObj) {
+      try {
+        if (!roomObj) {
+          sessionStorage.removeItem(LAST_ROOM_STORAGE_KEY);
+          return;
+        }
+        if (roomObj.type === "dm" && roomObj.friend) {
+          sessionStorage.setItem(LAST_ROOM_STORAGE_KEY, JSON.stringify({
+            type: "dm",
+            name: roomObj.friend.name,
+            email: roomObj.friend.email
+          }));
+        } else if (roomObj.type === "group" && roomObj.groupId) {
+          sessionStorage.setItem(LAST_ROOM_STORAGE_KEY, JSON.stringify({
+            type: "group",
+            groupId: roomObj.groupId
+          }));
+        }
+      } catch (_) {}
+    }
+
+    function handlePageRefresh() {
+      saveLastRoomToSession(activeRoom);
+      window.location.reload();
+    }
+
+    sidebarRefreshBtn.addEventListener("click", handlePageRefresh);
+    chatRefreshBtn.addEventListener("click", handlePageRefresh);
+
+    mobileBackBtn.addEventListener("click", () => {
+      appShell.classList.remove("mobile-chat-open");
+      emojiPickerPanel.classList.remove("open");
+    });
+
+    function safeUnsub(unsubFn) {
+      if (typeof unsubFn === "function") {
+        try { unsubFn(); } catch (_) {}
+      }
+    }
+
+    let currentUser = null;
+    let authUnsubs = [];
+    let allUsersMap = {};
+    let allUsersByUid = {};
+    let friendsMap = {};
+    let myGroupIdsMap = {};
+    let allGroupChatsMap = {};
+    let restoredRoomOnce = false;
+
+    let activeRoom = null;
+    let activeChatUnsub = null;
+
+    let readStateMap = {};
+    let unreadCounts = {};
+    let latestMsgTsMap = {};
+    let lastNotifiedMsgId = {};
+    let roomWatchers = {};
+    let incomingCallWatchers = {};
+    let cleanedPathsSet = new Set();
+
+    // WebRTC Voice Call state
+    let peerConnection = null;
+    let localStream = null;
+    let currentCallId = null;
+    let currentCallSessionId = null;
+    let currentPeerUid = null;
+    let isCallerRole = false;
+    let callRefUnsub = null;
+    let iceCandidateUnsub = null;
+    let isMuted = false;
+    let incomingCallData = null;
+    let callConnectedAt = null;
+    let callDurationTimer = null;
+    let ringTimeoutId = null;
+    let loggedCallEventsSet = new Set();
+    let pendingRemoteCandidates = [];
+    let hasRemoteAudioTrack = false;
+
+    let ringAudioCtx = null;
+    let ringIntervalId = null;
+
+    // --- FCM Web Push & PC Taskbar Notification Functions ---
+    function isPushConfigured() {
+      return Boolean(
+        FCM_VAPID_KEY &&
+        !FCM_VAPID_KEY.startsWith("여기에") &&
+        PUSH_WORKER_URL &&
+        !PUSH_WORKER_URL.startsWith("https://여기에")
+      );
+    }
+
+    function tokenToKey(token) {
+      return String(token).replace(/[.#$[\]/]/g, "_");
+    }
+
+    function updatePushButtonUi(fcmRegistered = false) {
+      if (!("Notification" in window)) {
+        enablePushBtn.style.display = "none";
+        return;
+      }
+      if (Notification.permission === "granted") {
+        enablePushBtn.classList.add("enabled");
+        enablePushBtn.textContent = fcmRegistered ? "🔔 푸시 ON" : "🔔 알림 ON";
+      } else if (Notification.permission === "denied") {
+        enablePushBtn.classList.remove("enabled");
+        enablePushBtn.textContent = "🔕 알림 차단됨";
+      } else {
+        enablePushBtn.classList.remove("enabled");
+        enablePushBtn.textContent = "🔔 알림 켜기";
+      }
+    }
+
+    async function registerPushToken(user, fromUserClick = false) {
+      if (!user || !("Notification" in window)) return;
+      try {
+        let perm = Notification.permission;
+        if (perm === "default") {
+          perm = await Notification.requestPermission();
+        }
+        updatePushButtonUi(false);
+
+        if (perm !== "granted") {
+          if (fromUserClick) {
+            alert("브라우저 알림 권한이 허용되지 않았습니다.\n주소창 왼쪽 설정(자물쇠) 또는 기기 설정에서 알림을 허용해 주세요.");
+          }
+          return;
+        }
+
+        if (!FCM_VAPID_KEY || FCM_VAPID_KEY.startsWith("여기에")) {
+          if (fromUserClick) {
+            alert("PC/브라우저 알림이 켜졌습니다.\n핸드폰 잠금화면 푸시까지 쓰려면 index.html의 FCM_VAPID_KEY와 PUSH_WORKER_URL을 입력해 주세요.");
+          }
+          return;
+        }
+
+        const supported = await isSupported().catch(() => false);
+        if (!supported) {
+          if (fromUserClick) {
+            alert("PC/브라우저 기본 알림이 켜졌습니다.\n(참고: 아이폰은 Safari 공유 -> 홈 화면에 추가한 앱에서 알림을 켜야 잠금화면 푸시가 작동합니다.)");
+          }
+          return;
+        }
+
+        const reg = (swRegPromise ? await swRegPromise : null) || (await navigator.serviceWorker.ready);
+        const messaging = getMessaging(app);
+        const fcmToken = await getToken(messaging, {
+          vapidKey: FCM_VAPID_KEY,
+          serviceWorkerRegistration: reg
+        });
+
+        if (fcmToken) {
+          await set(ref(db, `fcmTokens/${user.uid}/${tokenToKey(fcmToken)}`), {
+            token: fcmToken,
+            updatedAt: Date.now()
+          });
+          updatePushButtonUi(true);
+          if (fromUserClick) {
+            alert("잠금화면 및 백그라운드 푸시 알림이 정상 등록되었습니다!");
+          }
+        }
+      } catch (err) {
+        console.warn("FCM 토큰 등록 실패:", err);
+        if (fromUserClick) {
+          alert("푸시 알림 등록 중 오류가 발생했습니다.\nVAPID 키와 HTTPS(GitHub Pages) 접속 여부를 확인해 주세요.\n오류: " + (err && err.message ? err.message : err));
+        }
+      }
+    }
+
+    enablePushBtn.addEventListener("click", () => {
+      if (!currentUser) return;
+      registerPushToken(currentUser, true);
+    });
+
+    function normalizeWorkerUrl(rawUrl) {
+      return String(rawUrl || "").trim().replace(/^\[|\]$/g, "").replace(/\/+$/, "");
+    }
+
+    async function sendRemotePush(targetUids, title, bodyText, type = "chat") {
+      const workerEndpoint = normalizeWorkerUrl(PUSH_WORKER_URL);
+      if (!currentUser || !FCM_VAPID_KEY || FCM_VAPID_KEY.startsWith("여기에") || !workerEndpoint || workerEndpoint.includes("여기에")) {
+        return;
+      }
+      const cleanedTargets = Array.isArray(targetUids)
+        ? targetUids.filter((u) => typeof u === "string" && u && u !== currentUser.uid)
+        : [];
+      if (cleanedTargets.length === 0) return;
+
+      const finalBody =
+        HIDE_PUSH_MESSAGE_PREVIEW && type === "chat"
+          ? "새 메시지가 도착했습니다."
+          : bodyText;
+
+      try {
+        const idToken = await currentUser.getIdToken();
+        const res = await fetch(workerEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            targetUids: cleanedTargets,
+            title,
+            body: finalBody,
+            type,
+            url: location.origin + location.pathname
+          })
+        });
+        if (!res.ok) {
+          const errDetail = await res.text().catch(() => "");
+          console.warn("원격 푸시 응답 오류:", res.status, errDetail);
+        }
+      } catch (err) {
+        console.warn("원격 푸시 발송 실패:", err);
+      }
+    }
+
+    function showDesktopNotification(title, bodyText, isCall = false) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      if (document.hasFocus() && !isCall) return;
+      try {
+        const noti = new Notification(title, {
+          body: bodyText,
+          icon: "./icon-192.png",
+          tag: isCall ? "local-voice-call" : "local-chat-msg",
+          renotify: true,
+          requireInteraction: isCall
+        });
+        noti.onclick = () => {
+          window.focus();
+          noti.close();
+        };
+      } catch (_) {}
+    }
+
+    function getAudioContext() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!ringAudioCtx) {
+        ringAudioCtx = new AudioCtx();
+      }
+      if (ringAudioCtx.state === "suspended") {
+        ringAudioCtx.resume().catch(() => {});
+      }
+      return ringAudioCtx;
+    }
+
+    function triggerPhoneBellBurst(ctx, startTime, durationSec) {
+      const oscA = ctx.createOscillator();
+      const oscB = ctx.createOscillator();
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      const masterGain = ctx.createGain();
+
+      // 클래식 전화 벨소리 듀얼 톤 + 20Hz 떨림(따르르르릉)
+      oscA.type = "triangle";
+      oscB.type = "sine";
+      oscA.frequency.setValueAtTime(440, startTime);
+      oscB.frequency.setValueAtTime(480, startTime);
+
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(20, startTime);
+      lfoGain.gain.setValueAtTime(0.16, startTime);
+
+      masterGain.gain.setValueAtTime(0.001, startTime);
+      masterGain.gain.exponentialRampToValueAtTime(0.28, startTime + 0.04);
+      masterGain.gain.setValueAtTime(0.28, startTime + durationSec - 0.05);
+      masterGain.gain.exponentialRampToValueAtTime(0.0001, startTime + durationSec);
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(masterGain.gain);
+
+      oscA.connect(masterGain);
+      oscB.connect(masterGain);
+      masterGain.connect(ctx.destination);
+
+      oscA.start(startTime);
+      oscB.start(startTime);
+      lfo.start(startTime);
+
+      oscA.stop(startTime + durationSec + 0.02);
+      oscB.stop(startTime + durationSec + 0.02);
+      lfo.stop(startTime + durationSec + 0.02);
+    }
+
+    function playIncomingRingCycle() {
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate([450, 180, 450]);
+        }
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        // 따르르르릉(0.65초) - 짧은 쉼(0.18초) - 따르르르릉(0.65초)
+        triggerPhoneBellBurst(ctx, now, 0.65);
+        triggerPhoneBellBurst(ctx, now + 0.83, 0.65);
+      } catch (_) {}
+    }
+
+    function playRingbackCycle() {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = "sine";
+        osc2.type = "sine";
+        osc1.frequency.setValueAtTime(440, now);
+        osc2.frequency.setValueAtTime(480, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.09, now + 0.04);
+        gain.gain.setValueAtTime(0.09, now + 0.85);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 1.0);
+        osc2.stop(now + 1.0);
+      } catch (_) {}
+    }
+
+    function startIncomingRingtone() {
+      stopAllTones();
+      playIncomingRingCycle();
+      ringIntervalId = setInterval(playIncomingRingCycle, 2800);
+    }
+
+    function startRingbackTone() {
+      stopAllTones();
+      playRingbackCycle();
+      ringIntervalId = setInterval(playRingbackCycle, 2600);
+    }
+
+    function stopAllTones() {
+      if (ringIntervalId) {
+        clearInterval(ringIntervalId);
+        ringIntervalId = null;
+      }
+      if (navigator.vibrate) {
+        try { navigator.vibrate(0); } catch (_) {}
+      }
+    }
+
+    function unlockRemoteAudioElement() {
+      try {
+        remoteAudio.muted = false;
+        remoteAudio.volume = 1.0;
+        const p = remoteAudio.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch (_) {}
+    }
+
+    document.addEventListener("pointerdown", () => {
+      getAudioContext();
+      if (remoteAudio && remoteAudio.srcObject && remoteAudio.paused) {
+        remoteAudio.play().catch(() => {});
+      }
+    });
+
+    function showIncomingCallModal(callerName, callerEmail) {
+      incomingCallerTitle.textContent = `${callerName} 님 보이스톡`;
+      incomingCallerSub.textContent = `${callerEmail || "친구"} · 통화를 수락하거나 거절하세요.`;
+      incomingCallModal.classList.add("open");
+      startIncomingRingtone();
+      // PC 다른 작업 중일 때 우측 하단(시계 위)에도 착신 알림 표시
+      showDesktopNotification(`📞 보이스톡 · ${callerName}`, "클릭해서 통화를 수락하거나 거절하세요.", true);
+    }
+
+    function hideIncomingCallModal() {
+      incomingCallModal.classList.remove("open");
+      stopAllTones();
+    }
+
+    async function pruneOldMessagesAtPath(dbPath) {
+      if (!currentUser || !dbPath || cleanedPathsSet.has(dbPath)) return;
+      cleanedPathsSet.add(dbPath);
+      try {
+        const snap = await get(ref(db, dbPath));
+        const val = snap.val();
+        if (!val) return;
+
+        const cutoffTs = Date.now() - RETENTION_MS;
+        const sortedEntries = Object.entries(val).sort(
+          (a, b) => (Number(a[1] && a[1].createdAt) || 0) - (Number(b[1] && b[1].createdAt) || 0)
+        );
+
+        const updates = {};
+        let deleteCount = 0;
+        for (const [msgId, msg] of sortedEntries) {
+          const ts = Number(msg && msg.createdAt) || 0;
+          if (ts > 0 && ts < cutoffTs) {
+            updates[dbPath + "/" + msgId] = null;
+            deleteCount += 1;
+          } else {
+            break;
+          }
+        }
+
+        if (deleteCount > 0) {
+          await update(ref(db), updates);
+        }
+      } catch (err) {
+        console.warn("오래된 메시지 정리 건너뜀:", dbPath, err);
+      }
+    }
+
+    async function appendCallSystemMessageOnce(eventKey, peerUid, text) {
+      if (!currentUser || !peerUid || !text || !eventKey) return;
+      if (loggedCallEventsSet.has(eventKey)) return;
+      loggedCallEventsSet.add(eventKey);
+
+      const chatId = getPrivateChatId(currentUser.uid, peerUid);
+      const nowTs = Date.now();
+      try {
+        await push(ref(db, "chats/" + chatId + "/messages"), {
+          type: "call_log",
+          senderUid: currentUser.uid,
+          senderEmail: normEmail(currentUser.email),
+          text,
+          createdAt: nowTs
+        });
+        await markChatAsRead(chatId, nowTs);
+      } catch (err) {
+        console.error("통화 기록 저장 실패:", err);
+      }
+    }
+
+    function formatDuration(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const min = String(Math.floor(totalSec / 60)).padStart(2, "0");
+      const sec = String(totalSec % 60).padStart(2, "0");
+      return `${min}:${sec}`;
+    }
+
+    // --- Unicode Emoji Generator ---
+    const EMOJI_RANGES = {
+      faces: [
+        [0x1F600, 0x1F64F],
+        [0x1F910, 0x1F92F],
+        [0x1F970, 0x1F97A],
+        [0x1F9D0, 0x1FA00]
+      ],
+      nature: [
+        [0x1F400, 0x1F43F],
+        [0x1F980, 0x1F9AE],
+        [0x1F330, 0x1F353],
+        [0x1F300, 0x1F321]
+      ],
+      food: [
+        [0x1F354, 0x1F37F],
+        [0x1F950, 0x1F96B],
+        [0x1F9C0, 0x1F9CB]
+      ],
+      objects: [
+        [0x1F380, 0x1F3FF],
+        [0x1F440, 0x1F4FF],
+        [0x1F680, 0x1F6C5],
+        [0x1F6E0, 0x1F6FF],
+        [0x1F500, 0x1F53D]
+      ],
+      symbols: [
+        [0x2600, 0x26FF],
+        [0x2700, 0x27BF],
+        [0x1F1E6, 0x1F1FF],
+        [0x1F7E0, 0x1F7EB],
+        [0x1FA70, 0x1FAFF]
+      ]
+    };
+
+    const EMOJI_CATEGORIES = [
+      { id: "all", label: "전체" },
+      { id: "faces", label: "표정·사람" },
+      { id: "nature", label: "동물·자연" },
+      { id: "food", label: "음식" },
+      { id: "objects", label: "사물·이동" },
+      { id: "symbols", label: "기호·깃발" }
+    ];
+
+    const emojiCacheByCat = {};
+    let activeEmojiCat = "all";
+
+    function buildEmojisForCategory(catId) {
+      if (emojiCacheByCat[catId]) return emojiCacheByCat[catId];
+      const ranges =
+        catId === "all"
+          ? Object.values(EMOJI_RANGES).flat()
+          : (EMOJI_RANGES[catId] || []);
+
+      const list = [];
+      for (const [start, end] of ranges) {
+        for (let cp = start; cp <= end; cp++) {
+          if (cp >= 0xD800 && cp <= 0xDFFF) continue;
+          try {
+            list.push(String.fromCodePoint(cp));
+          } catch (_) {}
+        }
+      }
+      emojiCacheByCat[catId] = list;
+      return list;
+    }
+
+    function renderEmojiGrid(catId) {
+      activeEmojiCat = catId;
+      Array.from(emojiCatBar.children).forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.cat === catId);
+      });
+
+      const list = buildEmojisForCategory(catId);
+      const frag = document.createDocumentFragment();
+      list.forEach((em) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-cell-btn";
+        btn.textContent = em;
+        btn.addEventListener("click", () => {
+          if (messageInput.disabled) return;
+          const start = messageInput.selectionStart ?? messageInput.value.length;
+          const end = messageInput.selectionEnd ?? messageInput.value.length;
+          messageInput.value = messageInput.value.slice(0, start) + em + messageInput.value.slice(end);
+          const nextPos = start + em.length;
+          messageInput.focus();
+          messageInput.setSelectionRange(nextPos, nextPos);
+        });
+        frag.appendChild(btn);
+      });
+      emojiGrid.innerHTML = "";
+      emojiGrid.appendChild(frag);
+    }
+
+    function initEmojiPanel() {
+      emojiCatBar.innerHTML = "";
+      EMOJI_CATEGORIES.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-cat-btn" + (cat.id === activeEmojiCat ? " active" : "");
+        btn.dataset.cat = cat.id;
+        btn.textContent = cat.label;
+        btn.addEventListener("click", () => renderEmojiGrid(cat.id));
+        emojiCatBar.appendChild(btn);
+      });
+      renderEmojiGrid("all");
+    }
+
+    initEmojiPanel();
+
+    emojiToggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (emojiToggleBtn.disabled) return;
+      emojiPickerPanel.classList.toggle("open");
+      if (emojiPickerPanel.classList.contains("open")) {
+        renderEmojiGrid(activeEmojiCat);
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!emojiPickerPanel.contains(e.target) && e.target !== emojiToggleBtn) {
+        emojiPickerPanel.classList.remove("open");
+      }
+    });
+
+    function setChatInputEnabled(enabled) {
+      messageInput.disabled = !enabled;
+      sendBtn.disabled = !enabled;
+      emojiToggleBtn.disabled = !enabled;
+      if (!enabled) {
+        emojiPickerPanel.classList.remove("open");
+      }
+    }
+
+    function updateVoiceCallButtonState() {
+      if (!currentUser || !activeRoom || activeRoom.type !== "dm" || !activeRoom.friend || !activeRoom.friend.uid) {
+        voiceCallBtn.disabled = true;
+        return;
+      }
+      const info = allUsersMap[normEmail(activeRoom.friend.email)];
+      const isOnline = Boolean(info && info.online);
+      voiceCallBtn.disabled = !isOnline || Boolean(currentCallId);
+    }
+
+    function normEmail(email) {
+      return String(email || "").trim().toLowerCase();
+    }
+
+    function emailToKey(email) {
+      return normEmail(email).replace(/[.#$[\]]/g, "_");
+    }
+
+    function getPrivateChatId(uidA, uidB) {
+      return [uidA, uidB].sort().join("_");
+    }
+
+    function getGroupChatId(groupId) {
+      return "group_" + groupId;
+    }
+
+    function getVisibleGroupIds() {
+      if (!currentUser) return [];
+      const setIds = new Set(Object.keys(myGroupIdsMap || {}));
+      Object.entries(allGroupChatsMap || {}).forEach(([gId, gData]) => {
+        if (gData && gData.members && gData.members[currentUser.uid]) {
+          setIds.add(gId);
+        }
+      });
+      return Array.from(setIds);
+    }
+
+    function getSenderDisplayName(msg) {
+      if (!msg) return "알 수 없음";
+      if (msg.senderUid === (currentUser && currentUser.uid)) return "나";
+      const uByUid = msg.senderUid ? allUsersByUid[msg.senderUid] : null;
+      const email = normEmail((uByUid && uByUid.email) || msg.senderEmail || "");
+      const friendObj = Object.values(friendsMap).find((f) => normEmail(f.email) === email);
+      return (friendObj && friendObj.name) || email || "참여자";
+    }
+
+    function getUserDisplayNameByUid(uid) {
+      if (!uid) return "상대방";
+      if (uid === (currentUser && currentUser.uid)) return "나";
+      const u = allUsersByUid[uid];
+      const em = normEmail(u && u.email);
+      const fr = Object.values(friendsMap).find((f) => normEmail(f.email) === em);
+      return (fr && fr.name) || em || uid.slice(0, 6);
+    }
+
+    function formatTime(ts) {
+      if (!ts || typeof ts !== "number") return "";
+      const d = new Date(ts);
+      return d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    // --- WebRTC Voice Call Functions ---
+    function renderCallBanner(statusText, buttonsConfig, isConnectedStyle = false) {
+      callStatusText.textContent = statusText;
+      callControls.innerHTML = "";
+      buttonsConfig.forEach((b) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "call-btn " + b.className;
+        btn.textContent = b.label;
+        btn.addEventListener("click", b.onClick);
+        callControls.appendChild(btn);
+      });
+      callBanner.classList.toggle("connected", isConnectedStyle);
+      callBanner.classList.add("active");
+    }
+
+    function hideCallBanner() {
+      callBanner.classList.remove("active");
+      callBanner.classList.remove("connected");
+      callControls.innerHTML = "";
+      callStatusText.textContent = "";
+    }
+
+    async function ensureLocalAudio() {
+      if (localStream) {
+        const hasLiveTrack = localStream.getAudioTracks().some((t) => t.readyState === "live");
+        if (hasLiveTrack) {
+          localStream.getAudioTracks().forEach((t) => { t.enabled = true; });
+          return localStream;
+        }
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("이 브라우저는 마이크 음성 통화를 지원하지 않습니다. (HTTPS 환경 필요)");
+      }
+      localStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        },
+        video: false
+      });
+      return localStream;
+    }
+
+    async function flushPendingCandidates(pc) {
+      if (!pc || !pc.remoteDescription) return;
+      while (pendingRemoteCandidates.length > 0) {
+        const cand = pendingRemoteCandidates.shift();
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(cand));
+        } catch (err) {
+          console.error("대기 ICE 후보 추가 실패:", err);
+        }
+      }
+    }
+
+    function createPeerConnection(callId, sessionId, peerUid) {
+      pendingRemoteCandidates = [];
+      hasRemoteAudioTrack = false;
+      const pc = new RTCPeerConnection(RTC_CONFIG);
+
+      if (localStream) {
+        localStream.getTracks().forEach((track) => {
+          track.enabled = true;
+          pc.addTrack(track, localStream);
+        });
+      } else {
+        try {
+          pc.addTransceiver("audio", { direction: "sendrecv" });
+        } catch (_) {}
+      }
+
+      pc.ontrack = (event) => {
+        hasRemoteAudioTrack = true;
+        const inboundStream = (event.streams && event.streams[0]) || new MediaStream([event.track]);
+        inboundStream.getAudioTracks().forEach((t) => { t.enabled = true; });
+        remoteAudio.srcObject = inboundStream;
+        remoteAudio.muted = false;
+        remoteAudio.volume = 1.0;
+        const playPromise = remoteAudio.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+        if (currentPeerUid && callConnectedAt) {
+          enterConnectedCallUi(getUserDisplayNameByUid(currentPeerUid));
+        }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") {
+          unlockRemoteAudioElement();
+        }
+      };
+
+      const myCandidatesPath = `calls/${callId}/candidates/${sessionId}/${currentUser.uid}`;
+      const peerCandidatesPath = `calls/${callId}/candidates/${sessionId}/${peerUid}`;
+
+      pc.onicecandidate = async (event) => {
+        if (event.candidate && currentCallSessionId === sessionId) {
+          try {
+            await push(ref(db, myCandidatesPath), event.candidate.toJSON());
+          } catch (err) {
+            console.error("ICE 후보 전송 실패:", err);
+          }
+        }
+      };
+
+      safeUnsub(iceCandidateUnsub);
+      iceCandidateUnsub = onChildAdded(ref(db, peerCandidatesPath), async (snap) => {
+        if (currentCallSessionId !== sessionId) return;
+        const candData = snap.val();
+        if (!candData || pc.signalingState === "closed") return;
+        if (!pc.remoteDescription) {
+          pendingRemoteCandidates.push(candData);
+          return;
+        }
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(candData));
+        } catch (err) {
+          console.error("ICE 후보 추가 실패:", err);
+        }
+      });
+
+      return pc;
+    }
+
+    function detachActiveCallListeners() {
+      safeUnsub(callRefUnsub);
+      callRefUnsub = null;
+
+      safeUnsub(iceCandidateUnsub);
+      iceCandidateUnsub = null;
+
+      if (peerConnection) {
+        try {
+          peerConnection.ontrack = null;
+          peerConnection.onicecandidate = null;
+          peerConnection.close();
+        } catch (_) {}
+        peerConnection = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach((t) => t.stop());
+        localStream = null;
+      }
+      if (remoteAudio.srcObject) {
+        remoteAudio.srcObject = null;
+      }
+    }
+
+    function resetVoiceCallState() {
+      currentCallId = null;
+      currentCallSessionId = null;
+      currentPeerUid = null;
+      isCallerRole = false;
+      incomingCallData = null;
+      isMuted = false;
+      callConnectedAt = null;
+      pendingRemoteCandidates = [];
+      hasRemoteAudioTrack = false;
+
+      if (callDurationTimer) {
+        clearInterval(callDurationTimer);
+        callDurationTimer = null;
+      }
+      if (ringTimeoutId) {
+        clearTimeout(ringTimeoutId);
+        ringTimeoutId = null;
+      }
+
+      stopAllTones();
+      hideIncomingCallModal();
+      detachActiveCallListeners();
+      hideCallBanner();
+      updateVoiceCallButtonState();
+    }
+
+    function enterConnectedCallUi(peerName) {
+      stopAllTones();
+      if (ringTimeoutId) {
+        clearTimeout(ringTimeoutId);
+        ringTimeoutId = null;
+      }
+      if (!callConnectedAt) {
+        callConnectedAt = Date.now();
+      }
+      const renderStatus = () => {
+        const elapsed = formatDuration(Date.now() - callConnectedAt);
+        const audioTag = hasRemoteAudioTrack ? "음성 수신 중" : "음성 연결 대기";
+        renderCallBanner(
+          isMuted
+            ? `🎙️ ${peerName}님과 통화 중 (${elapsed} · 음소거됨)`
+            : `🔊 ${peerName}님과 통화 중 (${elapsed} · ${audioTag})`,
+          [
+            {
+              label: "🔊 소리 켜기",
+              className: "mute",
+              onClick: () => {
+                unlockRemoteAudioElement();
+              }
+            },
+            {
+              label: isMuted ? "마이크 켜기" : "내 마이크 끄기",
+              className: "mute" + (isMuted ? " muted" : ""),
+              onClick: toggleMute
+            },
+            {
+              label: "통화 종료",
+              className: "hangup",
+              onClick: () => endVoiceCall("ended")
+            }
+          ],
+          true
+        );
+      };
+
+      renderStatus();
+      if (callDurationTimer) clearInterval(callDurationTimer);
+      callDurationTimer = setInterval(renderStatus, 1000);
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      if (localStream) {
+        localStream.getAudioTracks().forEach((track) => {
+          track.enabled = !isMuted;
+        });
+      }
+      const peerName = getUserDisplayNameByUid(currentPeerUid);
+      enterConnectedCallUi(peerName);
+    }
+
+    async function endVoiceCall(reason = "ended") {
+      stopAllTones();
+      const targetCallId = currentCallId;
+      const targetSessionId = currentCallSessionId;
+      const targetPeerUid = currentPeerUid;
+      const wasCaller = isCallerRole;
+      const connectedTimestamp = callConnectedAt;
+
+      if (!targetCallId || !targetSessionId) {
+        resetVoiceCallState();
+        return;
+      }
+
+      resetVoiceCallState();
+
+      if (wasCaller && targetPeerUid) {
+        if (connectedTimestamp) {
+          const durationText = formatDuration(Date.now() - connectedTimestamp);
+          await appendCallSystemMessageOnce(
+            `${targetCallId}_${targetSessionId}_end`,
+            targetPeerUid,
+            `📴 보이스톡 종료 (${durationText})`
+          );
+        } else if (reason === "cancelled") {
+          await appendCallSystemMessageOnce(
+            `${targetCallId}_${targetSessionId}_end`,
+            targetPeerUid,
+            "📵 부재중 보이스톡"
+          );
+        } else if (reason === "no_answer") {
+          await appendCallSystemMessageOnce(
+            `${targetCallId}_${targetSessionId}_end`,
+            targetPeerUid,
+            "📵 부재중 보이스톡 (응답 없음)"
+          );
+        }
+      }
+
+      try {
+        await update(ref(db, "calls/" + targetCallId), {
+          sessionId: targetSessionId,
+          status: reason,
+          offer: null,
+          answer: null,
+          candidates: null,
+          updatedAt: Date.now()
+        });
+      } catch (_) {}
+    }
+
+    async function startOutgoingVoiceCall(peerUid) {
+      if (!currentUser || !peerUid) return;
+      if (currentCallId) return;
+      unlockRemoteAudioElement();
+
+      const callId = getPrivateChatId(currentUser.uid, peerUid);
+      const sessionId = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+      resetVoiceCallState();
+
+      currentCallId = callId;
+      currentCallSessionId = sessionId;
+      currentPeerUid = peerUid;
+      isCallerRole = true;
+      callConnectedAt = null;
+      updateVoiceCallButtonState();
+
+      const peerName = getUserDisplayNameByUid(peerUid);
+      renderCallBanner(`📞 ${peerName}님에게 보이스톡 거는 중...`, [
+        {
+          label: "취소",
+          className: "hangup",
+          onClick: () => endVoiceCall("cancelled")
+        }
+      ]);
+
+      startRingbackTone();
+
+      ringTimeoutId = setTimeout(() => {
+        if (currentCallSessionId === sessionId && !callConnectedAt) {
+          endVoiceCall("no_answer");
+        }
+      }, RING_TIMEOUT_MS);
+
+      try {
+        await ensureLocalAudio();
+        if (currentCallSessionId !== sessionId) return;
+
+        const pc = createPeerConnection(callId, sessionId, peerUid);
+        peerConnection = pc;
+
+        const offer = await pc.createOffer({ offerToReceiveAudio: true });
+        if (currentCallSessionId !== sessionId) return;
+
+        await pc.setLocalDescription(offer);
+        if (currentCallSessionId !== sessionId) return;
+
+        await set(ref(db, "calls/" + callId), {
+          sessionId,
+          callerUid: currentUser.uid,
+          calleeUid: peerUid,
+          status: "ringing",
+          offer: { type: offer.type, sdp: offer.sdp },
+          answer: null,
+          candidates: null,
+          updatedAt: Date.now()
+        });
+        if (currentCallSessionId !== sessionId) return;
+
+        // 잠금화면·백그라운드 푸시 발송 (보이스톡 수신 알림)
+        sendRemotePush(
+          [peerUid],
+          "📞 보이스톡 수신",
+          `${currentUser.email}님이 보이스톡을 걸었습니다.`,
+          "call"
+        );
+
+        callRefUnsub = onValue(ref(db, "calls/" + callId), async (snap) => {
+          if (currentCallSessionId !== sessionId) return;
+          const data = snap.val();
+          if (!data || data.sessionId !== sessionId) return;
+
+          if (data.status === "rejected") {
+            resetVoiceCallState();
+            await appendCallSystemMessageOnce(
+              `${callId}_${sessionId}_end`,
+              peerUid,
+              "📵 부재중 보이스톡 (상대방 거절)"
+            );
+            return;
+          }
+
+          if (data.status === "ended") {
+            const elapsed = callConnectedAt ? formatDuration(Date.now() - callConnectedAt) : "00:00";
+            resetVoiceCallState();
+            await appendCallSystemMessageOnce(
+              `${callId}_${sessionId}_end`,
+              peerUid,
+              `📴 보이스톡 종료 (${elapsed})`
+            );
+            return;
+          }
+
+          if (data.answer && peerConnection && !peerConnection.currentRemoteDescription) {
+            stopAllTones();
+            try {
+              await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+              await flushPendingCandidates(peerConnection);
+              if (currentCallSessionId !== sessionId) return;
+              await appendCallSystemMessageOnce(
+                `${callId}_${sessionId}_start`,
+                peerUid,
+                "📞 보이스톡 통화 시작"
+              );
+              enterConnectedCallUi(peerName);
+            } catch (err) {
+              console.error("응답 SDP 설정 실패:", err);
+            }
+          }
+        });
+      } catch (err) {
+        stopAllTones();
+        console.error("보이스톡 발신 실패:", err);
+        alert("보이스톡을 시작할 수 없습니다: " + (err && err.message ? err.message : err));
+        resetVoiceCallState();
+      }
+    }
+
+    async function acceptIncomingVoiceCall() {
+      if (!currentUser || !incomingCallData) return;
+      unlockRemoteAudioElement();
+      stopAllTones();
+      const { callId, sessionId, callerUid, offer } = incomingCallData;
+      resetVoiceCallState();
+
+      currentCallId = callId;
+      currentCallSessionId = sessionId;
+      currentPeerUid = callerUid;
+      isCallerRole = false;
+      callConnectedAt = null;
+      hideIncomingCallModal();
+      updateVoiceCallButtonState();
+
+      const callerName = getUserDisplayNameByUid(callerUid);
+      renderCallBanner(`🔊 ${callerName}님과 보이스톡 연결 중...`, [
+        {
+          label: "통화 종료",
+          className: "hangup",
+          onClick: () => endVoiceCall("ended")
+        }
+      ]);
+
+      try {
+        await ensureLocalAudio();
+        if (currentCallSessionId !== sessionId) return;
+
+        const pc = createPeerConnection(callId, sessionId, callerUid);
+        peerConnection = pc;
+
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        await flushPendingCandidates(pc);
+        if (currentCallSessionId !== sessionId) return;
+
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        if (currentCallSessionId !== sessionId) return;
+
+        await update(ref(db, "calls/" + callId), {
+          answer: { type: answer.type, sdp: answer.sdp },
+          status: "connected",
+          updatedAt: Date.now()
+        });
+        if (currentCallSessionId !== sessionId) return;
+
+        callRefUnsub = onValue(ref(db, "calls/" + callId), (snap) => {
+          if (currentCallSessionId !== sessionId) return;
+          const data = snap.val();
+          if (!data || data.sessionId !== sessionId || data.status === "ended" || data.status === "cancelled" || data.status === "no_answer") {
+            resetVoiceCallState();
+          }
+        });
+
+        enterConnectedCallUi(callerName);
+      } catch (err) {
+        console.error("보이스톡 수락 실패:", err);
+        alert("통화 연결에 실패했습니다: " + (err && err.message ? err.message : err));
+        await endVoiceCall("ended");
+      }
+    }
+
+    async function rejectIncomingVoiceCall() {
+      stopAllTones();
+      hideIncomingCallModal();
+      if (!incomingCallData) return;
+      const { callId, sessionId } = incomingCallData;
+      incomingCallData = null;
+      hideCallBanner();
+      try {
+        await update(ref(db, "calls/" + callId), {
+          sessionId,
+          status: "rejected",
+          offer: null,
+          candidates: null,
+          updatedAt: Date.now()
+        });
+      } catch (_) {}
+    }
+
+    modalAcceptCallBtn.addEventListener("click", acceptIncomingVoiceCall);
+    modalRejectCallBtn.addEventListener("click", rejectIncomingVoiceCall);
+
+    function syncIncomingCallWatchers() {
+      if (!currentUser) return;
+      const desiredCallIds = new Set();
+
+      Object.values(friendsMap).forEach((f) => {
+        const info = allUsersMap[normEmail(f.email)];
+        if (info && info.uid && info.uid !== currentUser.uid) {
+          desiredCallIds.add(getPrivateChatId(currentUser.uid, info.uid));
+        }
+      });
+
+      Object.values(allUsersByUid).forEach((u) => {
+        if (u && u.uid && u.uid !== currentUser.uid) {
+          desiredCallIds.add(getPrivateChatId(currentUser.uid, u.uid));
+        }
+      });
+
+      Object.keys(incomingCallWatchers).forEach((cId) => {
+        if (!desiredCallIds.has(cId)) {
+          safeUnsub(incomingCallWatchers[cId]);
+          delete incomingCallWatchers[cId];
+        }
+      });
+
+      desiredCallIds.forEach((cId) => {
+        if (incomingCallWatchers[cId]) return;
+        const cRef = ref(db, "calls/" + cId);
+        incomingCallWatchers[cId] = onValue(cRef, (snap) => {
+          if (!currentUser) return;
+          const cData = snap.val();
+
+          if (cData && cData.calleeUid === currentUser.uid && cData.status === "ringing" && cData.offer && cData.sessionId) {
+            if (!currentCallId && (!incomingCallData || incomingCallData.callId !== cId || incomingCallData.sessionId !== cData.sessionId)) {
+              incomingCallData = {
+                callId: cId,
+                sessionId: cData.sessionId,
+                callerUid: cData.callerUid,
+                offer: cData.offer
+              };
+              const callerName = getUserDisplayNameByUid(cData.callerUid);
+              const u = allUsersByUid[cData.callerUid];
+              showIncomingCallModal(callerName, u && u.email ? u.email : "");
+            }
+          } else if (incomingCallData && incomingCallData.callId === cId) {
+            incomingCallData = null;
+            hideIncomingCallModal();
+          }
+        });
+      });
+    }
+
+    voiceCallBtn.addEventListener("click", () => {
+      if (!currentUser || !activeRoom || activeRoom.type !== "dm" || !activeRoom.friend || !activeRoom.friend.uid) return;
+      startOutgoingVoiceCall(activeRoom.friend.uid);
+    });
+
+    // --- Chat & Room Functions ---
+    async function markChatAsRead(roomKey, upToTs) {
+      if (!currentUser || !roomKey) return;
+      const maxTs = Math.max(Date.now(), Number(upToTs) || 0, Number(latestMsgTsMap[roomKey]) || 0);
+      readStateMap[roomKey] = maxTs;
+      unreadCounts[roomKey] = 0;
+      renderGroupList();
+      renderFriendList();
+      updatePageTitle();
+      try {
+        await set(ref(db, "readState/" + currentUser.uid + "/" + roomKey), maxTs);
+      } catch (err) {
+        console.error("readState 저장 실패:", err);
+      }
+    }
+
+    function updatePageTitle() {
+      const total = Object.values(unreadCounts).reduce((acc, n) => acc + (n || 0), 0);
+      document.title = total > 0 ? `(${total}) 하하하 메신저` : "하하하 메신저 (1:1 · 단체톡 · 보이스톡)";
+    }
+
+    function getActiveRoomKey() {
+      if (!currentUser || !activeRoom) return null;
+      if (activeRoom.type === "dm" && activeRoom.friend && activeRoom.friend.uid) {
+        return getPrivateChatId(currentUser.uid, activeRoom.friend.uid);
+      }
+      if (activeRoom.type === "group" && activeRoom.groupId) {
+        return getGroupChatId(activeRoom.groupId);
+      }
+      return null;
+    }
+
+    function syncRoomWatchers() {
+      if (!currentUser) return;
+      const desiredRooms = new Map();
+
+      Object.values(friendsMap).forEach((f) => {
+        const info = allUsersMap[normEmail(f.email)];
+        if (info && info.uid) {
+          const rKey = getPrivateChatId(currentUser.uid, info.uid);
+          desiredRooms.set(rKey, {
+            dbPath: "chats/" + rKey + "/messages",
+            type: "dm",
+            friendEmail: normEmail(f.email)
+          });
+        }
+      });
+
+      getVisibleGroupIds().forEach((gId) => {
+        const rKey = getGroupChatId(gId);
+        desiredRooms.set(rKey, {
+          dbPath: "groupMessages/" + gId + "/messages",
+          type: "group",
+          groupId: gId
+        });
+      });
+
+      Object.keys(roomWatchers).forEach((rKey) => {
+        if (!desiredRooms.has(rKey)) {
+          safeUnsub(roomWatchers[rKey]);
+          delete roomWatchers[rKey];
+          delete unreadCounts[rKey];
+          delete latestMsgTsMap[rKey];
+        }
+      });
+
+      desiredRooms.forEach((meta, rKey) => {
+        if (roomWatchers[rKey]) return;
+        // 트래픽 절약: 백그라운드 방 감시는 최근 30개 메시지만 구독
+        const qRef = query(ref(db, meta.dbPath), limitToLast(WATCHER_CHAT_LIMIT));
+
+        roomWatchers[rKey] = onValue(qRef, (snap) => {
+          const msgsObj = snap.val() || {};
+          const entries = Object.entries(msgsObj);
+          const maxCreatedAt = entries.reduce((mx, [, m]) => Math.max(mx, Number(m && m.createdAt) || 0), 0);
+          latestMsgTsMap[rKey] = maxCreatedAt;
+
+          const lastRead = Number(readStateMap[rKey]) || 0;
+          const isCurrentRoomOpen = getActiveRoomKey() === rKey && document.hasFocus();
+
+          if (isCurrentRoomOpen) {
+            unreadCounts[rKey] = 0;
+            const latestEntry = entries[entries.length - 1];
+            if (latestEntry) lastNotifiedMsgId[rKey] = latestEntry[0];
+            markChatAsRead(rKey, maxCreatedAt);
+            return;
+          }
+
+          let count = 0;
+          entries.forEach(([, m]) => {
+            if (!m) return;
+            if (m.senderUid !== currentUser.uid && (Number(m.createdAt) || 0) > lastRead) {
+              count += 1;
+            }
+          });
+          unreadCounts[rKey] = count;
+
+          const latestEntry = entries[entries.length - 1];
+          if (latestEntry) {
+            const [latestId, latestMsg] = latestEntry;
+            if (
+              latestMsg &&
+              latestMsg.senderUid !== currentUser.uid &&
+              (Number(latestMsg.createdAt) || 0) > lastRead &&
+              lastNotifiedMsgId[rKey] !== latestId
+            ) {
+              lastNotifiedMsgId[rKey] = latestId;
+              const senderLabel = getSenderDisplayName(latestMsg);
+              if (meta.type === "group") {
+                const gTitle = (allGroupChatsMap[meta.groupId] && allGroupChatsMap[meta.groupId].title) || "단체톡";
+                showDesktopNotification(`새 톡 · ${gTitle} (${senderLabel})`, latestMsg.text || "새 메시지가 도착했습니다.", false);
+              } else {
+                showDesktopNotification(`새 톡 · ${senderLabel}`, latestMsg.text || "새 메시지가 도착했습니다.", false);
+              }
+            }
+          }
+
+          renderGroupList();
+          renderFriendList();
+          updatePageTitle();
+        });
+      });
+    }
+
+    function tryRestoreLastRoom() {
+      if (restoredRoomOnce || activeRoom) return;
+      try {
+        const raw = sessionStorage.getItem(LAST_ROOM_STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (saved && saved.type === "dm" && saved.email) {
+          const emailNorm = normEmail(saved.email);
+          const friendEntry = Object.values(friendsMap).find((f) => normEmail(f.email) === emailNorm);
+          if (friendEntry && allUsersMap[emailNorm]) {
+            restoredRoomOnce = true;
+            sessionStorage.removeItem(LAST_ROOM_STORAGE_KEY);
+            openChatWithFriend({ name: friendEntry.name, email: emailNorm });
+          }
+        } else if (saved && saved.type === "group" && saved.groupId) {
+          if (allGroupChatsMap[saved.groupId]) {
+            restoredRoomOnce = true;
+            sessionStorage.removeItem(LAST_ROOM_STORAGE_KEY);
+            openGroupChat(saved.groupId);
+          }
+        }
+      } catch (_) {}
+    }
+
+    tabFriendBtn.addEventListener("click", () => {
+      tabFriendBtn.classList.add("active");
+      tabGroupBtn.classList.remove("active");
+      addFriendBox.classList.remove("hidden");
+      createGroupBox.classList.remove("active");
+    });
+
+    tabGroupBtn.addEventListener("click", () => {
+      tabGroupBtn.classList.add("active");
+      tabFriendBtn.classList.remove("active");
+      addFriendBox.classList.add("hidden");
+      createGroupBox.classList.add("active");
+      renderGroupMemberPicker();
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      loginError.textContent = "";
+      const email = loginEmail.value.trim();
+      const pw = loginPassword.value;
+      if (!email || !pw) {
+        loginError.textContent = "이메일과 비밀번호를 모두 입력하세요.";
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+      } catch (err) {
+        loginError.textContent = "로그인 실패: " + (err && err.code ? err.code : "계정 정보를 확인하세요.");
+      }
+    });
+
+    loginPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loginBtn.click();
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      saveLastRoomToSession(null);
+      if (currentCallId) {
+        await endVoiceCall(callConnectedAt ? "ended" : "cancelled");
+      } else {
+        resetVoiceCallState();
+      }
+      if (currentUser) {
+        const myPresenceRef = ref(db, "users/" + currentUser.uid);
+        await set(myPresenceRef, {
+          uid: currentUser.uid,
+          email: normEmail(currentUser.email),
+          online: false,
+          lastSeen: Date.now()
+        });
+      }
+      await signOut(auth);
+    });
+
+    function clearAuthUnsubs() {
+      authUnsubs.forEach(safeUnsub);
+      authUnsubs = [];
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      clearAuthUnsubs();
+
+      if (user) {
+        currentUser = user;
+        restoredRoomOnce = false;
+        cleanedPathsSet.clear();
+        loginBox.style.display = "none";
+        appShell.classList.add("active");
+        myEmailLabel.textContent = user.email;
+        updatePushButtonUi(false);
+
+        // 이미 알림 권한이 허용돼 있으면 자동 토큰 갱신 (미허용 시 버튼 클릭으로 허용)
+        if ("Notification" in window && Notification.permission === "granted") {
+          registerPushToken(user, false);
+        }
+
+        const myUserRef = ref(db, "users/" + user.uid);
+        const connectedRef = ref(db, ".info/connected");
+
+        authUnsubs.push(onValue(connectedRef, async (snap) => {
+          if (snap.val() === true) {
+            await onDisconnect(myUserRef).set({
+              uid: user.uid,
+              email: normEmail(user.email),
+              online: false,
+              lastSeen: serverTimestamp()
+            });
+            await set(myUserRef, {
+              uid: user.uid,
+              email: normEmail(user.email),
+              online: true,
+              lastSeen: Date.now()
+            });
+          }
+        }));
+
+        authUnsubs.push(onValue(ref(db, "readState/" + user.uid), (snap) => {
+          readStateMap = snap.val() || {};
+          syncRoomWatchers();
+          renderGroupList();
+          renderFriendList();
+          updatePageTitle();
+        }));
+
+        authUnsubs.push(onValue(ref(db, "users"), (snap) => {
+          allUsersMap = {};
+          allUsersByUid = {};
+          const val = snap.val() || {};
+          Object.values(val).forEach((u) => {
+            if (u && u.email) {
+              allUsersMap[normEmail(u.email)] = u;
+            }
+            if (u && u.uid) {
+              allUsersByUid[u.uid] = u;
+            }
+          });
+          renderGroupMemberPicker();
+          syncRoomWatchers();
+          syncIncomingCallWatchers();
+          renderGroupList();
+          renderFriendList();
+          updateActiveRoomHeader();
+          updateVoiceCallButtonState();
+          tryRestoreLastRoom();
+          if (activeRoom && activeRoom.type === "dm" && activeRoom.friend && !activeRoom.friend.uid) {
+            const matched = allUsersMap[normEmail(activeRoom.friend.email)];
+            if (matched && matched.uid) {
+              openChatWithFriend({ name: activeRoom.friend.name, email: activeRoom.friend.email });
+            }
+          }
+        }));
+
+        authUnsubs.push(onValue(ref(db, "friends/" + user.uid), (snap) => {
+          friendsMap = snap.val() || {};
+          renderGroupMemberPicker();
+          syncRoomWatchers();
+          syncIncomingCallWatchers();
+          renderFriendList();
+          tryRestoreLastRoom();
+        }));
+
+        authUnsubs.push(onValue(ref(db, "userGroups/" + user.uid), (snap) => {
+          myGroupIdsMap = snap.val() || {};
+          syncRoomWatchers();
+          renderGroupList();
+        }));
+
+        authUnsubs.push(onValue(ref(db, "groupChats"), (snap) => {
+          allGroupChatsMap = snap.val() || {};
+          syncRoomWatchers();
+          renderGroupList();
+          updateActiveRoomHeader();
+          tryRestoreLastRoom();
+        }));
+      } else {
+        resetVoiceCallState();
+        currentUser = null;
+        activeRoom = null;
+        myGroupIdsMap = {};
+        allGroupChatsMap = {};
+        cleanedPathsSet.clear();
+        appShell.classList.remove("mobile-chat-open");
+        safeUnsub(activeChatUnsub);
+        activeChatUnsub = null;
+        Object.values(roomWatchers).forEach(safeUnsub);
+        roomWatchers = {};
+        Object.values(incomingCallWatchers).forEach(safeUnsub);
+        incomingCallWatchers = {};
+        unreadCounts = {};
+        latestMsgTsMap = {};
+        updatePageTitle();
+        appShell.classList.remove("active");
+        loginBox.style.display = "block";
+        setChatInputEnabled(false);
+        updateVoiceCallButtonState();
+      }
+    });
+
+    window.addEventListener("focus", () => {
+      const rKey = getActiveRoomKey();
+      if (currentUser && rKey) {
+        markChatAsRead(rKey, latestMsgTsMap[rKey]);
+      }
+      if (remoteAudio && remoteAudio.srcObject && remoteAudio.paused) {
+        remoteAudio.play().catch(() => {});
+      }
+    });
+
+    addFriendBtn.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const name = friendNameInput.value.trim();
+      const email = normEmail(friendEmailInput.value);
+      if (!email) {
+        alert("친구 계정의 이메일을 입력하세요.");
+        return;
+      }
+      if (email === normEmail(currentUser.email)) {
+        alert("본인 계정은 친구로 추가할 수 없습니다.");
+        return;
+      }
+      const fKey = emailToKey(email);
+      try {
+        await set(ref(db, "friends/" + currentUser.uid + "/" + fKey), {
+          name: name || email,
+          email: email
+        });
+        friendNameInput.value = "";
+        friendEmailInput.value = "";
+      } catch (err) {
+        console.error("친구 추가 실패:", err);
+        alert("친구 추가에 실패했습니다: " + (err && err.message ? err.message : err));
+      }
+    });
+
+    function renderGroupMemberPicker() {
+      groupMemberPicker.innerHTML = "";
+      const friends = Object.values(friendsMap);
+      if (friends.length === 0) {
+        groupMemberPicker.innerHTML = '<div style="font-size:11px;color:#6b7280;">초대할 친구가 없습니다. 먼저 친구를 추가하세요.</div>';
+        return;
+      }
+
+      friends.forEach((f) => {
+        const fEmail = normEmail(f.email);
+        const uInfo = allUsersMap[fEmail];
+        const canInvite = Boolean(uInfo && uInfo.uid);
+
+        const label = document.createElement("label");
+        label.className = "group-member-option";
+        if (!canInvite) label.style.opacity = "0.55";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = uInfo && uInfo.uid ? uInfo.uid : "";
+        cb.dataset.email = fEmail;
+        cb.disabled = !canInvite;
+
+        const span = document.createElement("span");
+        span.textContent = canInvite ? `${f.name} (${fEmail})` : `${f.name} (미접속·로그인 필요)`;
+
+        label.appendChild(cb);
+        label.appendChild(span);
+        groupMemberPicker.appendChild(label);
+      });
+    }
+
+    createGroupBtn.addEventListener("click", async () => {
+      if (!currentUser) return;
+      const title = groupTitleInput.value.trim();
+      const checkedBoxes = Array.from(groupMemberPicker.querySelectorAll('input[type="checkbox"]:checked'));
+      const invitedUids = checkedBoxes.map((cb) => cb.value).filter(Boolean);
+
+      if (!title) {
+        alert("단체톡 방 이름을 입력하세요.");
+        return;
+      }
+      if (invitedUids.length < 1) {
+        alert("단체톡에 초대할 친구를 1명 이상 선택하세요.");
+        return;
+      }
+
+      const memberUidsSet = new Set([currentUser.uid, ...invitedUids]);
+      const membersObj = {};
+      memberUidsSet.forEach((uid) => {
+        membersObj[uid] = true;
+      });
+
+      createGroupBtn.disabled = true;
+      try {
+        const newGroupRef = push(ref(db, "groupChats"));
+        const groupId = newGroupRef.key;
+        if (!groupId) {
+          throw new Error("단체톡 방 ID를 생성하지 못했습니다.");
+        }
+
+        const groupPayload = {
+          groupId,
+          title,
+          createdBy: currentUser.uid,
+          createdAt: Date.now(),
+          members: membersObj
+        };
+
+        await set(newGroupRef, groupPayload);
+        await set(ref(db, "userGroups/" + currentUser.uid + "/" + groupId), true);
+
+        allGroupChatsMap[groupId] = groupPayload;
+        myGroupIdsMap[groupId] = true;
+
+        groupTitleInput.value = "";
+        checkedBoxes.forEach((cb) => { cb.checked = false; });
+
+        openGroupChat(groupId);
+      } catch (err) {
+        console.error("단체톡 방 생성 실패:", err);
+        alert("단체톡 방 생성에 실패했습니다.\nFirebase Realtime Database 규칙에 groupChats, userGroups가 추가되어 있는지 확인해 주세요.\n오류: " + (err && err.message ? err.message : err));
+      } finally {
+        createGroupBtn.disabled = false;
+      }
+    });
+
+    function renderGroupList() {
+      groupListEl.innerHTML = "";
+      const gIds = getVisibleGroupIds();
+      if (gIds.length === 0) {
+        groupListEl.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:#6b7280;text-align:center;">참여 중인 단체톡이 없습니다.</div>';
+        return;
+      }
+
+      gIds.forEach((gId) => {
+        const meta = allGroupChatsMap[gId] || {};
+        const rKey = getGroupChatId(gId);
+        const unread = unreadCounts[rKey] || 0;
+        const memberCount = meta.members ? Object.keys(meta.members).length : 0;
+        const isSelected = activeRoom && activeRoom.type === "group" && activeRoom.groupId === gId;
+
+        const item = document.createElement("div");
+        item.className = "friend-item" + (isSelected ? " selected" : "");
+
+        const infoDiv = document.createElement("div");
+        const titleEl = document.createElement("div");
+        titleEl.className = "friend-name";
+        titleEl.textContent = meta.title || "단체톡방";
+
+        const subEl = document.createElement("div");
+        subEl.className = "friend-sub";
+        subEl.textContent = memberCount > 0 ? `참여자 ${memberCount}명` : "단체 채팅방";
+
+        infoDiv.appendChild(titleEl);
+        infoDiv.appendChild(subEl);
+
+        const rightDiv = document.createElement("div");
+        rightDiv.className = "friend-right";
+
+        if (unread > 0) {
+          const unreadEl = document.createElement("span");
+          unreadEl.className = "unread-badge";
+          unreadEl.textContent = unread > 99 ? "99+" : String(unread);
+          rightDiv.appendChild(unreadEl);
+        }
+
+        const badge = document.createElement("span");
+        badge.className = "group-badge";
+        badge.textContent = "단체톡";
+        rightDiv.appendChild(badge);
+
+        item.appendChild(infoDiv);
+        item.appendChild(rightDiv);
+
+        item.addEventListener("click", () => openGroupChat(gId));
+        groupListEl.appendChild(item);
+      });
+    }
+
+    function renderFriendList() {
+      friendListEl.innerHTML = "";
+      const entries = Object.values(friendsMap);
+      if (entries.length === 0) {
+        friendListEl.innerHTML = '<div style="padding:16px;font-size:12px;color:#6b7280;text-align:center;">아직 추가된 친구가 없습니다.</div>';
+        return;
+      }
+
+      entries.forEach((f) => {
+        const fEmail = normEmail(f.email);
+        const userInfo = allUsersMap[fEmail];
+        const isOnline = Boolean(userInfo && userInfo.online);
+        const cId = currentUser && userInfo && userInfo.uid ? getPrivateChatId(currentUser.uid, userInfo.uid) : null;
+        const unread = cId ? (unreadCounts[cId] || 0) : 0;
+        const isSelected = activeRoom && activeRoom.type === "dm" && activeRoom.friend && normEmail(activeRoom.friend.email) === fEmail;
+
+        const item = document.createElement("div");
+        item.className = "friend-item" + (isSelected ? " selected" : "");
+
+        const nameDiv = document.createElement("div");
+        const nameEl = document.createElement("div");
+        nameEl.className = "friend-name";
+        nameEl.textContent = f.name;
+
+        const subEl = document.createElement("div");
+        subEl.className = "friend-sub";
+        subEl.textContent = fEmail;
+
+        nameDiv.appendChild(nameEl);
+        nameDiv.appendChild(subEl);
+
+        const rightDiv = document.createElement("div");
+        rightDiv.className = "friend-right";
+
+        if (unread > 0) {
+          const unreadEl = document.createElement("span");
+          unreadEl.className = "unread-badge";
+          unreadEl.textContent = unread > 99 ? "99+" : String(unread);
+          rightDiv.appendChild(unreadEl);
+        }
+
+        const badge = document.createElement("span");
+        badge.className = "presence-badge " + (isOnline ? "online" : "offline");
+        badge.textContent = isOnline ? "접속 중" : "오프라인";
+        rightDiv.appendChild(badge);
+
+        item.appendChild(nameDiv);
+        item.appendChild(rightDiv);
+
+        item.addEventListener("click", () => {
+          openChatWithFriend({ name: f.name, email: fEmail });
+        });
+
+        friendListEl.appendChild(item);
+      });
+    }
+
+    function updateActiveRoomHeader() {
+      if (!activeRoom) return;
+      if (activeRoom.type === "dm" && activeRoom.friend) {
+        const info = allUsersMap[normEmail(activeRoom.friend.email)];
+        const isOnline = Boolean(info && info.online);
+        chatTitle.textContent = activeRoom.friend.name;
+        chatSubtitle.textContent = isOnline
+          ? "● 현재 접속 중 (1:1 채팅 · 보이스톡 가능)"
+          : (info && typeof info.lastSeen === "number" ? "오프라인 · 최근 접속 " + formatTime(info.lastSeen) : "오프라인 (1:1 채팅)");
+      } else if (activeRoom.type === "group" && activeRoom.groupId) {
+        const meta = allGroupChatsMap[activeRoom.groupId] || {};
+        const memberUids = meta.members ? Object.keys(meta.members) : [];
+        const names = memberUids.map((uid) => getUserDisplayNameByUid(uid));
+        chatTitle.textContent = meta.title || "단체톡방";
+        chatSubtitle.textContent = names.length > 0 ? `참여자 (${names.length}명): ${names.join(", ")}` : "단체 채팅방";
+      }
+    }
+
+    async function deleteOwnMessage(dbPath, msgId, messageData) {
+      if (!currentUser || !dbPath || !msgId || !messageData) return;
+      if (messageData.senderUid !== currentUser.uid) {
+        alert("본인이 보낸 메시지만 삭제할 수 있습니다.");
+        return;
+      }
+      if (!confirm("이 메시지를 삭제하시겠습니까?")) return;
+
+      try {
+        await remove(ref(db, dbPath + "/" + msgId));
+      } catch (err) {
+        console.error("메시지 삭제 실패:", err);
+        alert("메시지 삭제 중 오류가 발생했습니다.");
+      }
+    }
+
+    function attachMessageListener(dbPath, roomKey, emptyText, isGroup) {
+      safeUnsub(activeChatUnsub);
+      activeChatUnsub = null;
+
+      pruneOldMessagesAtPath(dbPath);
+      markChatAsRead(roomKey, latestMsgTsMap[roomKey]);
+
+      // 트래픽 절약: 열린 방에서는 최근 150개 메시지만 실시간 구독
+      const qRef = query(ref(db, dbPath), limitToLast(ACTIVE_CHAT_LIMIT));
+      activeChatUnsub = onValue(qRef, (snap) => {
+        messagesBox.innerHTML = "";
+        const msgs = snap.val() || {};
+        const entries = Object.entries(msgs);
+        const maxCreatedAt = entries.reduce((mx, [, m]) => Math.max(mx, Number(m && m.createdAt) || 0), 0);
+        latestMsgTsMap[roomKey] = maxCreatedAt;
+
+        if (entries.length === 0) {
+          messagesBox.innerHTML = `<div class="empty-chat">${emptyText}</div>`;
+          return;
+        }
+
+        entries.forEach(([msgId, m]) => {
+          if (!m) return;
+
+          if (m.type === "call_log") {
+            const sysRow = document.createElement("div");
+            sysRow.className = "system-msg-row";
+            const textSpan = document.createElement("span");
+            textSpan.textContent = m.text;
+            const timeSpan = document.createElement("span");
+            timeSpan.className = "system-msg-time";
+            timeSpan.textContent = formatTime(m.createdAt);
+            sysRow.appendChild(textSpan);
+            sysRow.appendChild(timeSpan);
+            messagesBox.appendChild(sysRow);
+            return;
+          }
+
+          const isMine = m.senderUid === currentUser.uid;
+          const row = document.createElement("div");
+          row.className = "msg-row " + (isMine ? "mine" : "theirs");
+
+          if (!isMine) {
+            const senderEl = document.createElement("div");
+            senderEl.className = "msg-sender";
+            senderEl.textContent = isGroup
+              ? getSenderDisplayName(m)
+              : ((activeRoom && activeRoom.friend && activeRoom.friend.name) || getSenderDisplayName(m));
+            row.appendChild(senderEl);
+          }
+
+          const wrap = document.createElement("div");
+          wrap.className = "msg-bubble-wrap";
+
+          const bubble = document.createElement("div");
+          bubble.className = "msg-bubble";
+          bubble.textContent = m.text;
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "msg-meta";
+
+          if (isMine) {
+            const delBtn = document.createElement("button");
+            delBtn.type = "button";
+            delBtn.className = "msg-delete-btn";
+            delBtn.textContent = "삭제";
+            delBtn.title = "내가 보낸 메시지 삭제";
+            delBtn.addEventListener("click", () => deleteOwnMessage(dbPath, msgId, m));
+            metaEl.appendChild(delBtn);
+          }
+
+          const timeEl = document.createElement("div");
+          timeEl.className = "msg-time";
+          timeEl.textContent = formatTime(m.createdAt);
+          metaEl.appendChild(timeEl);
+
+          wrap.appendChild(bubble);
+          wrap.appendChild(metaEl);
+          row.appendChild(wrap);
+          messagesBox.appendChild(row);
+        });
+
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+        if (document.hasFocus()) {
+          markChatAsRead(roomKey, maxCreatedAt);
+        }
+      });
+    }
+
+    function openChatWithFriend(friend) {
+      if (!currentUser) return;
+      const fEmail = normEmail(friend.email);
+      const info = allUsersMap[fEmail];
+      activeRoom = {
+        type: "dm",
+        friend: {
+          name: friend.name,
+          email: fEmail,
+          uid: info ? info.uid : null
+        }
+      };
+
+      appShell.classList.add("mobile-chat-open");
+      renderGroupList();
+      renderFriendList();
+      updateActiveRoomHeader();
+      updateVoiceCallButtonState();
+
+      safeUnsub(activeChatUnsub);
+      activeChatUnsub = null;
+
+      if (!activeRoom.friend.uid) {
+        messagesBox.innerHTML = '<div class="empty-chat">친구가 아직 한 번도 로그인하지 않아 UID를 불러올 수 없습니다.<br/>친구가 먼저 로그인한 뒤 다시 클릭해 주세요.</div>';
+        setChatInputEnabled(false);
+        return;
+      }
+
+      setChatInputEnabled(true);
+
+      const chatId = getPrivateChatId(currentUser.uid, activeRoom.friend.uid);
+      attachMessageListener(
+        "chats/" + chatId + "/messages",
+        chatId,
+        "1:1 대화방이 열렸습니다. 첫 메시지를 보내보세요!",
+        false
+      );
+    }
+
+    function openGroupChat(groupId) {
+      if (!currentUser || !groupId) return;
+      activeRoom = {
+        type: "group",
+        groupId
+      };
+
+      appShell.classList.add("mobile-chat-open");
+      renderGroupList();
+      renderFriendList();
+      updateActiveRoomHeader();
+      updateVoiceCallButtonState();
+
+      setChatInputEnabled(true);
+
+      const roomKey = getGroupChatId(groupId);
+      attachMessageListener(
+        "groupMessages/" + groupId + "/messages",
+        roomKey,
+        "단체톡방이 열렸습니다. 참여자들과 첫 메시지를 나눠보세요!",
+        true
+      );
+    }
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser || !activeRoom) return;
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      const nowTs = Date.now();
+      const payload = {
+        senderUid: currentUser.uid,
+        senderEmail: normEmail(currentUser.email),
+        text,
+        createdAt: nowTs
+      };
+
+      if (activeRoom.type === "dm" && activeRoom.friend && activeRoom.friend.uid) {
+        const chatId = getPrivateChatId(currentUser.uid, activeRoom.friend.uid);
+        await push(ref(db, "chats/" + chatId + "/messages"), payload);
+        await markChatAsRead(chatId, nowTs);
+        sendRemotePush([activeRoom.friend.uid], `새 톡 · ${currentUser.email}`, text, "chat");
+      } else if (activeRoom.type === "group" && activeRoom.groupId) {
+        const roomKey = getGroupChatId(activeRoom.groupId);
+        await push(ref(db, "groupMessages/" + activeRoom.groupId + "/messages"), payload);
+        await markChatAsRead(roomKey, nowTs);
+        const meta = allGroupChatsMap[activeRoom.groupId] || {};
+        const memberUids = meta.members ? Object.keys(meta.members) : [];
+        const gTitle = meta.title || "단체톡";
+        sendRemotePush(memberUids, `${gTitle} · ${currentUser.email}`, text, "chat");
+      }
+
+      emojiPickerPanel.classList.remove("open");
+      messageInput.value = "";
+      messageInput.focus();
+    });
+  </script>
+</body>
+</html>
